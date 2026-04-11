@@ -1,0 +1,3816 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Sorting Algorithms — DSA Lecture</title>
+  <link
+    href="https://fonts.googleapis.com/css2?family=Ubuntu:wght@400;500;700&family=Open+Sans:wght@400;600&family=JetBrains+Mono:wght@400;500;700&display=swap"
+    rel="stylesheet">
+  <style>
+    /* ── Reset ── */
+    *,
+    *::before,
+    *::after {
+      box-sizing: border-box;
+      margin: 0;
+      padding: 0
+    }
+
+    body {
+      font-family: 'Open Sans', sans-serif;
+      background: #fff;
+      overflow: hidden;
+      height: 100vh;
+      width: 100vw
+    }
+
+    /* ── Slide engine ── */
+    .deck {
+      width: 100vw;
+      height: 100vh;
+      position: relative
+    }
+
+    .slide {
+      position: absolute;
+      inset: 0;
+      display: flex;
+      flex-direction: column;
+      opacity: 0;
+      visibility: hidden;
+      transition: opacity .35s ease, transform .35s ease;
+      transform: translateX(40px);
+      overflow: hidden
+    }
+
+    .slide.active {
+      opacity: 1;
+      visibility: visible;
+      transform: none
+    }
+
+    .slide.prev {
+      transform: translateX(-40px)
+    }
+
+    /* ── Progress bar ── */
+    .progress {
+      position: fixed;
+      top: 0;
+      left: 0;
+      height: 3px;
+      background: #017a93;
+      transition: width .4s ease;
+      z-index: 200
+    }
+
+    /* ── Nav pill ── */
+    .nav-pill {
+      position: fixed;
+      bottom: 12px;
+      right: 12px;
+      background: rgba(255, 255, 255, .7);
+      backdrop-filter: blur(8px);
+      border: 1px solid #e2e8f0;
+      border-radius: 8px;
+      padding: 5px 10px;
+      display: flex;
+      align-items: center;
+      gap: 6px;
+      box-shadow: 0 1px 8px rgba(0, 0, 0, .06);
+      z-index: 100
+    }
+
+    .nav-btn {
+      width: 26px;
+      height: 26px;
+      border-radius: 5px;
+      border: none;
+      background: transparent;
+      color: #94a3b8;
+      font-size: 13px;
+      cursor: pointer;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      transition: all .15s
+    }
+
+    .nav-btn:hover {
+      color: #017a93
+    }
+
+    .nav-btn:disabled {
+      opacity: .25;
+      cursor: default
+    }
+
+    .nav-counter {
+      font-family: 'JetBrains Mono', monospace;
+      font-size: 11px;
+      color: #94a3b8
+    }
+
+    /* ── Layout ── */
+    .pad {
+      padding: 44px 68px 80px;
+      display: flex;
+      flex-direction: column;
+      height: 100%
+    }
+
+    .two-col {
+      display: grid;
+      grid-template-columns: 1fr 1fr;
+      gap: 20px;
+      flex: 1;
+      min-height: 0
+    }
+
+    .three-col {
+      display: grid;
+      grid-template-columns: 1fr 1fr 1fr;
+      gap: 16px
+    }
+
+    /* ── Typography ── */
+    .stag {
+      font-family: 'JetBrains Mono', monospace;
+      font-size: 11px;
+      letter-spacing: .15em;
+      text-transform: uppercase;
+      color: #017a93;
+      margin-bottom: 10px
+    }
+
+    h1 {
+      font-family: 'Ubuntu', sans-serif;
+      font-size: clamp(36px, 7vw, 108px);
+      font-weight: 700;
+      color: #1e293b;
+      line-height: 1.05
+    }
+
+    h2 {
+      font-family: 'Ubuntu', sans-serif;
+      font-size: clamp(28px, 3.8vw, 42px);
+      font-weight: 700;
+      color: #1e293b;
+      line-height: 1.1;
+      margin-bottom: 6px
+    }
+
+    h3 {
+      font-family: 'Ubuntu', sans-serif;
+      font-size: 18px;
+      font-weight: 700;
+      color: #017a93;
+      margin-bottom: 8px
+    }
+
+    .accent {
+      color: #017a93
+    }
+
+    p.desc {
+      font-size: 16px;
+      color: #475569;
+      line-height: 1.65;
+      margin: 12px 0
+    }
+
+    /* ── Tags ── */
+    .tags {
+      display: flex;
+      gap: 8px;
+      flex-wrap: wrap;
+      margin: 12px 0
+    }
+
+    .tag {
+      font-family: 'JetBrains Mono', monospace;
+      font-size: 11px;
+      padding: 4px 12px;
+      border-radius: 20px;
+      font-weight: 500
+    }
+
+    .ti {
+      background: #f1f5f9;
+      color: #017a93;
+      border: 1px solid #94a3b8
+    }
+
+    .tg {
+      background: #f0fdf4;
+      color: #16a34a;
+      border: 1px solid #bbf7d0
+    }
+
+    .to {
+      background: #fff7ed;
+      color: #c2410c;
+      border: 1px solid #fed7aa
+    }
+
+    .tn {
+      background: #f1f5f9;
+      color: #475569;
+      border: 1px solid #cbd5e1
+    }
+
+    /* ── Accent line ── */
+    .accent-line {
+      width: 56px;
+      height: 4px;
+      background: #017a93;
+      border-radius: 2px;
+      margin-bottom: 20px
+    }
+
+    /* ── Code blocks ── */
+    .code-wrap {
+      background: #0f172a;
+      border-radius: 10px;
+      overflow: hidden;
+      display: flex;
+      flex-direction: column;
+      min-height: 0
+    }
+
+    .code-head {
+      padding: 8px 16px;
+      border-bottom: 1px solid #1e293b;
+      flex-shrink: 0
+    }
+
+    .code-lang {
+      font-family: 'JetBrains Mono', monospace;
+      font-size: 13px;
+      color: #94a3b8;
+      letter-spacing: .06em;
+      text-transform: none;
+      font-weight: 500
+    }
+
+    pre {
+      padding: 16px 20px;
+      font-family: 'JetBrains Mono', monospace;
+      font-size: 14px;
+      line-height: 1.8;
+      color: #e2e8f0;
+      overflow: auto;
+      flex: 1
+    }
+
+    .kw {
+      color: #c084fc;
+      font-weight: 700
+    }
+
+    .fn {
+      color: #60a5fa;
+      font-weight: 700
+    }
+
+    .nm {
+      color: #fb923c
+    }
+
+    .cm {
+      color: #64748b;
+      font-style: italic
+    }
+
+    .op {
+      color: #e2e8f0
+    }
+
+    .pl {
+      color: #e2e8f0
+    }
+
+    /* pseudocode overrides */
+    .pseudo .kw {
+      color: #94a3b8;
+      font-style: italic
+    }
+
+    .pseudo .fn {
+      color: #94a3b8
+    }
+
+    /* ── Array cells ── */
+    .arr-row {
+      display: flex;
+      gap: 6px;
+      align-items: center;
+      flex-wrap: wrap
+    }
+
+    .cell {
+      width: 46px;
+      height: 46px;
+      border: 2px solid #cbd5e1;
+      border-radius: 8px;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      font-family: 'Ubuntu', sans-serif;
+      font-weight: 700;
+      font-size: 17px;
+      color: #1e293b;
+      background: #f1f5f9;
+      transition: all .2s
+    }
+
+    .cell.active {
+      background: #dbeafe;
+      border-color: #3b82f6;
+      color: #1d4ed8
+    }
+
+    .cell.sorted {
+      background: #dcfce7;
+      border-color: #22c55e;
+      color: #15803d
+    }
+
+    .cell.pivot {
+      background: #ffedd5;
+      border-color: #f97316;
+      color: #c2410c
+    }
+
+    .cell.gap {
+      background: #e2e8f0;
+      border-color: #475569;
+      color: #1e293b
+    }
+
+    .cell.bucket {
+      background: #fef9c3;
+      border-color: #eab308;
+      color: #854d0e
+    }
+
+    .cell.sm {
+      width: 34px;
+      height: 34px;
+      font-size: 13px
+    }
+
+    .arr-sep {
+      color: #94a3b8;
+      font-size: 1.1rem;
+      margin: 0 4px
+    }
+
+    .arr-label {
+      font-size: 13px;
+      color: #94a3b8;
+      margin-left: 8px
+    }
+
+    .step-label {
+      font-family: 'JetBrains Mono', monospace;
+      font-size: 11px;
+      color: #94a3b8;
+      text-transform: uppercase;
+      letter-spacing: .08em;
+      margin-bottom: 8px
+    }
+
+    .diagram-step {
+      margin-bottom: 16px
+    }
+
+    /* ── Overview flow tree ── */
+    .flow-tree {
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      gap: 2px;
+      overflow-y: auto;
+      max-height: 100%
+    }
+
+    .flow-row {
+      display: flex;
+      align-items: center;
+      gap: 4px;
+      justify-content: center;
+      flex-wrap: wrap
+    }
+
+    .flow-row .cell {
+      width: 34px;
+      height: 34px;
+      font-size: 13px
+    }
+
+    .flow-arrow {
+      color: #94a3b8;
+      font-size: 16px;
+      line-height: 1;
+      text-align: center
+    }
+
+    .flow-sep {
+      color: #94a3b8;
+      font-size: 14px;
+      margin: 0 6px;
+      font-weight: 600
+    }
+
+    .flow-lbl {
+      font-family: 'JetBrains Mono', monospace;
+      font-size: 10px;
+      color: #94a3b8;
+      text-transform: uppercase;
+      letter-spacing: .06em;
+      margin-bottom: 1px;
+      text-align: center
+    }
+
+    .flow-branch {
+      display: flex;
+      gap: 18px;
+      align-items: flex-start;
+      justify-content: center;
+      flex-wrap: wrap
+    }
+
+    .flow-branch>div {
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      gap: 2px
+    }
+
+    /* ── Info box ── */
+    .info-box {
+      background: #f1f5f9;
+      border-left: 4px solid #017a93;
+      border-radius: 0 8px 8px 0;
+      padding: 13px 17px;
+      margin: 12px 0
+    }
+
+    .info-box p {
+      color: #1e293b;
+      font-size: 15px
+    }
+
+    /* ── Compare table ── */
+    .compare-table {
+      width: 100%;
+      border-collapse: collapse;
+      margin-top: 16px;
+      font-size: 15px
+    }
+
+    .compare-table th {
+      background: #f1f5f9;
+      color: #475569;
+      padding: 9px 14px;
+      font-weight: 600;
+      font-size: 12px;
+      text-transform: uppercase;
+      letter-spacing: .06em
+    }
+
+    .compare-table td {
+      padding: 9px 14px;
+      border-bottom: 1px solid #e2e8f0;
+      color: #1e293b
+    }
+
+    .compare-table tr:last-child td {
+      border-bottom: none
+    }
+
+    .fast-row td {
+      color: #15803d;
+      font-weight: 600
+    }
+
+    .slow-row td {
+      color: #b45309
+    }
+
+    /* ── Complexity table ── */
+    .complexity-table {
+      width: 100%;
+      border-collapse: collapse;
+      margin-top: 8px;
+      font-size: 15px
+    }
+
+    .complexity-table th {
+      background: #017a93;
+      color: white;
+      padding: 11px 16px;
+      text-align: left;
+      font-weight: 600;
+      font-size: 13px;
+      letter-spacing: .04em
+    }
+
+    .complexity-table th:first-child {
+      border-radius: 8px 0 0 0
+    }
+
+    .complexity-table th:last-child {
+      border-radius: 0 8px 0 0
+    }
+
+    .complexity-table td {
+      padding: 10px 16px;
+      border-bottom: 1px solid #e2e8f0;
+      color: #1e293b;
+      font-size: 14px
+    }
+
+    .complexity-table tr:last-child td {
+      border-bottom: none
+    }
+
+    .complexity-table tr:nth-child(even) td {
+      background: #f8fafc
+    }
+
+    .complexity-table .best {
+      color: #15803d;
+      font-weight: 700
+    }
+
+    .complexity-table .weak {
+      color: #b45309;
+      font-weight: 700
+    }
+
+    .complexity-table .ok {
+      color: #1d4ed8;
+      font-weight: 600
+    }
+
+    /* ── Agenda ── */
+    .agenda-group {
+      margin-bottom: 18px
+    }
+
+    .agenda-group ul {
+      list-style: none;
+      padding: 0
+    }
+
+    .agenda-group li {
+      padding: 3px 0 3px 18px;
+      position: relative;
+      color: #475569;
+      font-size: 25px
+    }
+
+    .agenda-group li::before {
+      content: '›';
+      position: absolute;
+      left: 0;
+      color: #017a93;
+      font-weight: 700
+    }
+
+    /* ── D&C tree ── */
+    .tree {
+      font-size: 14px;
+      color: #475569;
+      line-height: 2;
+      font-family: 'JetBrains Mono', monospace;
+      background: #f1f5f9;
+      border-radius: 8px;
+      padding: 16px 22px
+    }
+
+    .tree .nh {
+      color: #017a93;
+      font-weight: 700
+    }
+
+    /* ── Step nav (within-slide pagination) ── */
+    .step-nav {
+      display: flex;
+      align-items: center;
+      gap: 12px;
+      padding: 14px 0 4px;
+      border-top: 1px solid #f1f5f9;
+      margin-top: auto;
+      flex-shrink: 0
+    }
+
+    .step-btn {
+      padding: 7px 18px;
+      border-radius: 8px;
+      border: 1px solid #017a93;
+      background: #f1f5f9;
+      color: #017a93;
+      font-family: 'Ubuntu', sans-serif;
+      font-size: 14px;
+      font-weight: 600;
+      cursor: pointer;
+      transition: all .15s
+    }
+
+    .step-btn:hover {
+      background: #017a93;
+      color: #fff
+    }
+
+    .step-btn:disabled {
+      opacity: .35;
+      cursor: default;
+      border-color: #e2e8f0;
+      background: #f8fafc;
+      color: #94a3b8
+    }
+
+    .step-ctr {
+      font-family: 'JetBrains Mono', monospace;
+      font-size: 12px;
+      color: #94a3b8
+    }
+
+    /* ── Shell Sort group pills ── */
+    .group-grid {
+      display: flex;
+      gap: 12px;
+      flex-wrap: wrap;
+      margin-top: 14px
+    }
+
+    .group-box {
+      border-radius: 8px;
+      padding: 10px 13px
+    }
+
+    .group-label {
+      font-family: 'JetBrains Mono', monospace;
+      font-size: 10px;
+      font-weight: 700;
+      letter-spacing: .05em;
+      margin-bottom: 7px
+    }
+
+    .g0 {
+      background: #ede9fe;
+      border: 1px solid #8b5cf6
+    }
+
+    .g0 .group-label {
+      color: #5b21b6
+    }
+
+    .g1 {
+      background: #ffedd5;
+      border: 1px solid #f97316
+    }
+
+    .g1 .group-label {
+      color: #c2410c
+    }
+
+    .g2 {
+      background: #dbeafe;
+      border: 1px solid #3b82f6
+    }
+
+    .g2 .group-label {
+      color: #1d4ed8
+    }
+
+    .g3 {
+      background: #dcfce7;
+      border: 1px solid #22c55e
+    }
+
+    .g3 .group-label {
+      color: #15803d
+    }
+
+    .g-arrow {
+      color: #94a3b8;
+      font-size: 18px;
+      padding: 0 5px;
+      align-self: center
+    }
+
+    .group-row {
+      display: flex;
+      align-items: center;
+      gap: 5px
+    }
+
+    /* ── Animation slide ── */
+    .anim-body {
+      display: grid;
+      grid-template-columns: 58% 42%;
+      gap: 20px;
+      flex: 1;
+      min-height: 0;
+      margin-top: 8px
+    }
+
+    .anim-left {
+      display: flex;
+      flex-direction: column;
+      gap: 8px;
+      min-height: 0
+    }
+
+    .anim-right {
+      display: flex;
+      flex-direction: column;
+      min-height: 0
+    }
+
+    .anim-desc {
+      font-size: 15px;
+      color: #475569;
+      line-height: 1.5;
+      min-height: 40px;
+      flex-shrink: 0
+    }
+
+    .bar-wrap {
+      display: flex;
+      gap: 8px;
+      align-items: flex-end;
+      height: 300px;
+      flex-shrink: 0
+    }
+
+    .bar-col {
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      gap: 5px
+    }
+
+    .bar-col .bar {
+      border-radius: 6px 6px 0 0;
+      width: 52px;
+      min-height: 4px;
+      transition: height .35s cubic-bezier(.4, 0, .2, 1), background .3s, opacity .3s
+    }
+
+    .bar-col .bval {
+      font-family: 'Ubuntu', sans-serif;
+      font-size: 14px;
+      font-weight: 700;
+      color: #1e293b
+    }
+
+    .bar-col .bidx {
+      font-family: 'JetBrains Mono', monospace;
+      font-size: 10px;
+      color: #94a3b8
+    }
+
+    /* ── Video controls ── */
+    .ctrl-bar {
+      display: flex;
+      align-items: center;
+      gap: 14px;
+      padding: 10px 0 6px;
+      border-top: 1px solid #f1f5f9;
+      flex-shrink: 0;
+      margin-top: auto
+    }
+
+    .ctrl-btn {
+      width: 36px;
+      height: 36px;
+      border-radius: 9px;
+      border: 1px solid #e2e8f0;
+      background: #fff;
+      color: #475569;
+      font-size: 16px;
+      cursor: pointer;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      transition: all .15s
+    }
+
+    .ctrl-btn:hover {
+      border-color: #017a93;
+      color: #017a93
+    }
+
+    .ctrl-btn.primary {
+      background: #017a93;
+      color: #fff;
+      border-color: #017a93
+    }
+
+    .ctrl-btn.primary:hover {
+      background: #1e293b
+    }
+
+    .tl-wrap {
+      flex: 1;
+      display: flex;
+      align-items: center
+    }
+
+    .tl-input {
+      -webkit-appearance: none;
+      appearance: none;
+      width: 100%;
+      height: 5px;
+      border-radius: 3px;
+      outline: none;
+      cursor: pointer;
+      background: linear-gradient(to right, #017a93 0%, #e2e8f0 0%)
+    }
+
+    .tl-input::-webkit-slider-thumb {
+      -webkit-appearance: none;
+      width: 18px;
+      height: 18px;
+      border-radius: 50%;
+      background: #017a93;
+      border: 3px solid #fff;
+      box-shadow: 0 1px 6px rgba(1, 122, 147, .45);
+      cursor: pointer
+    }
+
+    .step-counter {
+      font-family: 'JetBrains Mono', monospace;
+      font-size: 12px;
+      color: #94a3b8;
+      white-space: nowrap;
+      min-width: 54px;
+      text-align: right;
+      flex-shrink: 0
+    }
+
+    .speed-wrap {
+      display: flex;
+      align-items: center;
+      gap: 7px;
+      flex-shrink: 0
+    }
+
+    .speed-wrap label {
+      font-family: 'JetBrains Mono', monospace;
+      font-size: 10px;
+      color: #94a3b8;
+      text-transform: uppercase;
+      letter-spacing: .06em
+    }
+
+    input.speed-input {
+      -webkit-appearance: none;
+      appearance: none;
+      width: 90px;
+      height: 4px;
+      border-radius: 2px;
+      background: #e2e8f0;
+      cursor: pointer;
+      outline: none
+    }
+
+    input.speed-input::-webkit-slider-thumb {
+      -webkit-appearance: none;
+      width: 14px;
+      height: 14px;
+      border-radius: 50%;
+      background: #017a93;
+      border: 2px solid #fff;
+      box-shadow: 0 1px 4px rgba(1, 122, 147, .3);
+      cursor: pointer
+    }
+
+    /* ── Pseudocode panel ── */
+    .ps-wrap {
+      background: #0f172a;
+      border-radius: 10px;
+      overflow: hidden;
+      display: flex;
+      flex-direction: column;
+      height: 100%
+    }
+
+    .ps-head {
+      padding: 8px 16px;
+      border-bottom: 1px solid #1e293b;
+      flex-shrink: 0
+    }
+
+    .ps-lang {
+      font-family: 'JetBrains Mono', monospace;
+      font-size: 13px;
+      color: #94a3b8;
+      letter-spacing: .06em;
+      text-transform: none;
+      font-weight: 500
+    }
+
+    .ps-body {
+      padding: 8px 0;
+      font-family: 'JetBrains Mono', monospace;
+      font-size: 13.5px;
+      line-height: 1.9;
+      flex: 1;
+      overflow-y: auto
+    }
+
+    .ps-line {
+      padding: 1px 16px;
+      border-left: 3px solid transparent;
+      white-space: pre;
+      color: #94a3b8;
+      transition: background .15s, border-color .15s, color .15s
+    }
+
+    .ps-line.hl {
+      background: rgba(1, 122, 147, .2);
+      border-left-color: #017a93;
+      color: #f1f5f9;
+      font-weight: 500
+    }
+
+    .ps-kw {
+      color: #c084fc;
+      font-weight: 700
+    }
+
+    .ps-fn {
+      color: #60a5fa
+    }
+
+    .ps-nm {
+      color: #fb923c
+    }
+
+    .ps-cm {
+      color: #64748b;
+      font-style: italic
+    }
+  </style>
+</head>
+
+<body>
+  <div class="progress" id="progress"></div>
+  <div class="deck" id="deck">
+
+    <!-- ═══ SLIDE 1: Title ═══ -->
+    <div class="slide active">
+      <div class="pad" style="justify-content:center;position:relative">
+        <div class="stag" style="font-size:18px;letter-spacing:.18em">Data Structures &amp; Algorithms</div>
+        <h1>Sorting<br><span class="accent">Algorithms</span></h1>
+        <div class="accent-line" style="margin-top:24px"></div>
+        <p style="font-size:20px;color:#475569;line-height:1.6;margin:16px 0;max-width:800px">Divide &amp; Conquer ·
+          Merge Sort · Quick Sort · Shell Sort · Radix Sort · Heap Sort · Counting Sort</p>
+        <p style="margin-top:16px;font-size:18px;color:#94a3b8">
+          <span style="font-weight:700;color:#475569">Lecture 8</span>
+          &nbsp;·&nbsp;
+          Austėja Rušėnaitė
+          &nbsp;·&nbsp;
+          2026
+        </p>
+        <!-- Logos bottom-left -->
+        <div style="position:absolute;bottom:0;left:20px;display:flex;align-items:center;gap:12px;padding-bottom:12px">
+          <img src="https://www.vildika.com/wp-content/uploads/visma-logo-png-transparent-small.png" alt="Visma"
+            style="height:18px;object-fit:contain;opacity:0.85">
+          <img src="https://upload.wikimedia.org/wikipedia/commons/1/12/VILNIUS-TECH-LT.png" alt="Vilnius Tech"
+            style="height:20px;object-fit:contain;opacity:0.85">
+        </div>
+      </div>
+    </div>
+
+    <!-- ═══ SLIDE 2: Attendance ═══ -->
+    <div class="slide">
+      <div class="pad" style="justify-content:center;align-items:center;text-align:center">
+        <div class="stag">Attendance</div>
+        <h2 style="font-size:clamp(28px,4vw,48px)">Attendance Password</h2>
+        <div class="accent-line" style="margin:20px auto"></div>
+        <div
+          style="background:#f1f5f9;border:2px solid #017a93;border-radius:16px;padding:32px 64px;margin:16px 0;display:inline-block">
+          <span
+            style="font-family:'JetBrains Mono',monospace;font-size:clamp(42px,7vw,80px);font-weight:700;color:#1e293b;letter-spacing:.08em">pavasaris</span>
+        </div>
+        <p style="margin-top:20px;font-size:16px;color:#475569">Enter this password in <strong>Moodle</strong> to
+          register your attendance.</p>
+      </div>
+    </div>
+
+    <!-- ═══ SLIDE 3: Quiz Time ═══ -->
+    <div class="slide">
+      <div class="pad" style="justify-content:center;align-items:center;text-align:center">
+        <div style="font-size:clamp(80px,15vw,180px);line-height:1;margin-bottom:8px">&#129300;</div>
+        <h2 style="font-size:clamp(32px,5vw,56px)">Quiz <span class="accent">Time</span></h2>
+        <div class="accent-line" style="margin:20px auto"></div>
+        <p style="font-size:20px;color:#64748b;max-width:600px;margin:0 auto">Let&rsquo;s see what you remember from the
+          previous lecture.</p>
+      </div>
+    </div>
+
+    <!-- ═══ SLIDE 4: Agenda ═══ -->
+    <div class="slide">
+      <div class="pad">
+        <div class="stag">Lecture outline</div>
+        <h2>Agenda</h2>
+        <div class="accent-line"></div>
+        <div class="two-col" style="flex:unset;margin-top:4px">
+          <div>
+            <div class="agenda-group">
+              <h3>Foundations</h3>
+              <ul>
+                <li>Divide and Conquer</li>
+                <li>What makes a sort "fast"?</li>
+              </ul>
+            </div>
+            <div class="agenda-group">
+              <h3>Fast Sorting Algorithms</h3>
+              <ul>
+                <li>Merge Sort</li>
+                <li>Quick Sort</li>
+                <li>Shell Sort</li>
+              </ul>
+            </div>
+          </div>
+          <div>
+            <div class="agenda-group">
+              <h3>Additional Algorithms</h3>
+              <ul>
+                <li>Radix Sort</li>
+                <li>Heap Sort</li>
+                <li>Counting Sort</li>
+              </ul>
+            </div>
+            <div class="agenda-group">
+              <h3>Summary</h3>
+              <ul>
+                <li>Complexity comparison</li>
+              </ul>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <!-- ═══ SLIDE 3: Divide and Conquer ═══ -->
+    <div class="slide">
+      <div class="pad">
+        <div class="stag">Core concept</div>
+        <h2>Divide and <span class="accent">Conquer</span></h2>
+        <div class="accent-line"></div>
+        <div class="two-col" style="flex:unset;gap:28px">
+          <div>
+            <div class="info-box">
+              <p style="font-size:18px"><strong>Divide:</strong> Split the problem into smaller subproblems of the same
+                type.</p>
+            </div>
+            <div class="info-box" style="margin-top:10px">
+              <p style="font-size:18px"><strong>Conquer:</strong> Solve each subproblem recursively (base case:
+                trivially small).</p>
+            </div>
+            <div class="info-box" style="margin-top:10px">
+              <p style="font-size:18px"><strong>Combine:</strong> Merge the solutions of subproblems into a solution for
+                the original.</p>
+            </div>
+            <p class="desc" style="margin-top:14px;font-size:18px">Used by: <span class="tag ti"
+                style="font-size:14px">Merge Sort</span><span class="tag ti" style="font-size:14px">Quick Sort</span>
+            </p>
+            <div
+              style="margin-top:12px;padding:10px 16px 10px 14px;background:#fdf8f0;border-left:3px solid #c9a96e;border-radius:0 8px 8px 0;font-family:'Georgia',serif">
+              <p style="font-size:12.5px;color:#6b5a3e;line-height:1.6;font-style:italic;margin:0"><span
+                  style="font-weight:700;font-style:normal;color:#5a4228;font-size:13px">Divide et impera</span> —
+                "divide and rule." A military doctrine attributed to Philip&nbsp;II of Macedon (4th c.&nbsp;BC): keep
+                your enemies fragmented so they cannot unite against you. Julius Caesar and later Napoleon applied the
+                same principle. In computing, the logic is identical — break a hard problem into subproblems small
+                enough to solve trivially, then combine the results.</p>
+            </div>
+          </div>
+          <div style="display:flex;flex-direction:column;align-items:center;justify-content:center">
+            <!-- Divide & Rule illustration: united army → sword divides → scattered sub-groups -->
+            <svg viewBox="0 -20 600 310" width="600" height="330" style="font-family:'JetBrains Mono',monospace"
+              xmlns="http://www.w3.org/2000/svg">
+              <defs>
+                <marker id="dc-arr" markerWidth="8" markerHeight="8" refX="6" refY="4" orient="auto">
+                  <path d="M0,0 L8,4 L0,8 Z" fill="#017a93" />
+                </marker>
+              </defs>
+              <!-- ── LEFT: United army (the big problem) ── -->
+              <text x="75" y="-4" text-anchor="middle" font-size="11" font-weight="700" fill="#017a93"
+                letter-spacing=".06em">UNITED PROBLEM</text>
+              <!-- shield-like background -->
+              <rect x="20" y="10" width="110" height="200" rx="16" fill="#e0f2fe" stroke="#017a93" stroke-width="2" />
+              <!-- Soldier figures (5 stick figures in tight formation) -->
+              <g fill="#0c4a6e" stroke="#0c4a6e" stroke-width="1.5" stroke-linecap="round">
+                <!-- soldier 1 -->
+                <circle cx="48" cy="38" r="7" fill="#017a93" stroke="none" />
+                <line x1="48" y1="45" x2="48" y2="80" />
+                <line x1="48" y1="55" x2="36" y2="65" />
+                <line x1="48" y1="55" x2="60" y2="65" />
+                <line x1="48" y1="80" x2="40" y2="98" />
+                <line x1="48" y1="80" x2="56" y2="98" />
+                <!-- soldier 2 -->
+                <circle cx="102" cy="38" r="7" fill="#017a93" stroke="none" />
+                <line x1="102" y1="45" x2="102" y2="80" />
+                <line x1="102" y1="55" x2="90" y2="65" />
+                <line x1="102" y1="55" x2="114" y2="65" />
+                <line x1="102" y1="80" x2="94" y2="98" />
+                <line x1="102" y1="80" x2="110" y2="98" />
+                <!-- soldier 3 (centre) -->
+                <circle cx="75" cy="52" r="7" fill="#017a93" stroke="none" />
+                <line x1="75" y1="59" x2="75" y2="94" />
+                <line x1="75" y1="69" x2="63" y2="79" />
+                <line x1="75" y1="69" x2="87" y2="79" />
+                <line x1="75" y1="94" x2="67" y2="112" />
+                <line x1="75" y1="94" x2="83" y2="112" />
+                <!-- soldier 4 -->
+                <circle cx="48" cy="118" r="7" fill="#017a93" stroke="none" />
+                <line x1="48" y1="125" x2="48" y2="158" />
+                <line x1="48" y1="135" x2="36" y2="145" />
+                <line x1="48" y1="135" x2="60" y2="145" />
+                <line x1="48" y1="158" x2="40" y2="176" />
+                <line x1="48" y1="158" x2="56" y2="176" />
+                <!-- soldier 5 -->
+                <circle cx="102" cy="118" r="7" fill="#017a93" stroke="none" />
+                <line x1="102" y1="125" x2="102" y2="158" />
+                <line x1="102" y1="135" x2="90" y2="145" />
+                <line x1="102" y1="135" x2="114" y2="145" />
+                <line x1="102" y1="158" x2="94" y2="176" />
+                <line x1="102" y1="158" x2="110" y2="176" />
+              </g>
+              <text x="75" y="200" text-anchor="middle" font-size="10" fill="#475569">n elements</text>
+
+              <!-- ── CENTRE: Dividing sword / line ── -->
+              <!-- Sword blade -->
+              <line x1="190" y1="20" x2="190" y2="200" stroke="#94a3b8" stroke-width="2" stroke-dasharray="8 4" />
+              <!-- Sword shape on top -->
+              <polygon points="183,70 190,40 197,70" fill="#94a3b8" stroke="#64748b" stroke-width="1" />
+              <rect x="184" y="70" width="12" height="6" rx="1" fill="#64748b" />
+              <rect x="180" y="76" width="20" height="4" rx="2" fill="#475569" />
+              <line x1="190" y1="80" x2="190" y2="200" stroke="#64748b" stroke-width="3" stroke-linecap="round" />
+              <text x="190" y="225" text-anchor="middle" font-size="11" font-weight="700" fill="#64748b"
+                letter-spacing=".06em">DIVIDE</text>
+
+              <!-- ── Arrows from united → sub-groups ── -->
+              <line x1="135" y1="60" x2="240" y2="30" stroke="#017a93" stroke-width="1.5" marker-end="url(#dc-arr)" />
+              <line x1="135" y1="110" x2="240" y2="110" stroke="#017a93" stroke-width="1.5" marker-end="url(#dc-arr)" />
+              <line x1="135" y1="160" x2="240" y2="190" stroke="#017a93" stroke-width="1.5" marker-end="url(#dc-arr)" />
+
+              <!-- ── RIGHT: Scattered sub-groups (conquered individually) ── -->
+              <text x="420" y="-4" text-anchor="middle" font-size="11" font-weight="700" fill="#017a93"
+                letter-spacing=".06em">CONQUERED SUB-PROBLEMS</text>
+
+              <!-- Sub-group 1 (top-right) -->
+              <rect x="250" y="6" width="90" height="70" rx="12" fill="#f0fdf4" stroke="#22c55e" stroke-width="1.5" />
+              <g fill="#15803d" stroke="#15803d" stroke-width="1.2" stroke-linecap="round">
+                <circle cx="280" cy="22" r="5" stroke="none" />
+                <line x1="280" y1="27" x2="280" y2="50" />
+                <line x1="280" y1="34" x2="272" y2="42" />
+                <line x1="280" y1="34" x2="288" y2="42" />
+                <line x1="280" y1="50" x2="274" y2="62" />
+                <line x1="280" y1="50" x2="286" y2="62" />
+                <circle cx="318" cy="22" r="5" stroke="none" />
+                <line x1="318" y1="27" x2="318" y2="50" />
+                <line x1="318" y1="34" x2="310" y2="42" />
+                <line x1="318" y1="34" x2="326" y2="42" />
+                <line x1="318" y1="50" x2="312" y2="62" />
+                <line x1="318" y1="50" x2="324" y2="62" />
+              </g>
+              <text x="298" y="73" text-anchor="middle" font-size="9" fill="#15803d" font-weight="600">n/3</text>
+
+              <!-- Sub-group 2 (middle-right) -->
+              <rect x="370" y="76" width="90" height="70" rx="12" fill="#fef9c3" stroke="#eab308" stroke-width="1.5" />
+              <g fill="#854d0e" stroke="#854d0e" stroke-width="1.2" stroke-linecap="round">
+                <circle cx="415" cy="92" r="5" stroke="none" />
+                <line x1="415" y1="97" x2="415" y2="120" />
+                <line x1="415" y1="104" x2="407" y2="112" />
+                <line x1="415" y1="104" x2="423" y2="112" />
+                <line x1="415" y1="120" x2="409" y2="132" />
+                <line x1="415" y1="120" x2="421" y2="132" />
+              </g>
+              <text x="415" y="143" text-anchor="middle" font-size="9" fill="#854d0e" font-weight="600">n/3</text>
+
+              <!-- Sub-group 3 (bottom-right) -->
+              <rect x="250" y="160" width="90" height="70" rx="12" fill="#ede9fe" stroke="#8b5cf6" stroke-width="1.5" />
+              <g fill="#5b21b6" stroke="#5b21b6" stroke-width="1.2" stroke-linecap="round">
+                <circle cx="280" cy="176" r="5" stroke="none" />
+                <line x1="280" y1="181" x2="280" y2="204" />
+                <line x1="280" y1="188" x2="272" y2="196" />
+                <line x1="280" y1="188" x2="288" y2="196" />
+                <line x1="280" y1="204" x2="274" y2="216" />
+                <line x1="280" y1="204" x2="286" y2="216" />
+                <circle cx="318" cy="176" r="5" stroke="none" />
+                <line x1="318" y1="181" x2="318" y2="204" />
+                <line x1="318" y1="188" x2="310" y2="196" />
+                <line x1="318" y1="188" x2="326" y2="196" />
+                <line x1="318" y1="204" x2="312" y2="216" />
+                <line x1="318" y1="204" x2="324" y2="216" />
+              </g>
+              <text x="298" y="227" text-anchor="middle" font-size="9" fill="#5b21b6" font-weight="600">n/3</text>
+
+              <!-- Bottom annotation -->
+              <text x="300" y="295" text-anchor="middle" font-size="10" fill="#94a3b8" font-style="italic">"Divide et
+                impera" — break, conquer each piece, then combine</text>
+
+              <!-- CONQUER checkmarks -->
+              <text x="348" y="47" font-size="16" fill="#22c55e">&#10003;</text>
+              <text x="468" y="117" font-size="16" fill="#eab308">&#10003;</text>
+              <text x="348" y="201" font-size="16" fill="#8b5cf6">&#10003;</text>
+
+              <!-- COMBINE arrow at bottom -->
+              <path d="M250,250 Q300,280 420,250" fill="none" stroke="#017a93" stroke-width="1.5" stroke-dasharray="6 3"
+                marker-end="url(#dc-arr)" />
+              <text x="340" y="282" text-anchor="middle" font-size="11" font-weight="700" fill="#017a93"
+                letter-spacing=".06em">COMBINE</text>
+            </svg>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <!-- ═══ SLIDE 4: Fast Sorting intro ═══ -->
+    <div class="slide">
+      <div class="pad">
+        <div class="stag">Overview</div>
+        <h2>Fast Sorting <span class="accent">Algorithms</span></h2>
+        <div class="accent-line"></div>
+        <div class="info-box">
+          <p style="font-size:18px">A sorting algorithm is considered <strong>fast</strong> when its average-case time
+            complexity is <strong>O(n log n)</strong> — significantly better than the O(n²) of naive sorts for large
+            inputs.</p>
+        </div>
+        <div style="display:flex;justify-content:center;margin-top:14px">
+          <table class="compare-table" style="width:auto;min-width:520px;font-size:18px">
+            <thead>
+              <tr>
+                <th style="font-size:13px">Algorithm</th>
+                <th style="font-size:13px">Average Time</th>
+                <th style="font-size:13px">Category</th>
+              </tr>
+            </thead>
+            <tbody>
+              <tr class="slow-row">
+                <td>Bubble Sort</td>
+                <td>O(n²)</td>
+                <td>Naive</td>
+              </tr>
+              <tr class="slow-row">
+                <td>Insertion Sort</td>
+                <td>O(n²)</td>
+                <td>Naive</td>
+              </tr>
+              <tr class="slow-row">
+                <td>Selection Sort</td>
+                <td>O(n²)</td>
+                <td>Naive</td>
+              </tr>
+              <tr class="fast-row">
+                <td>Merge Sort</td>
+                <td>O(n log n)</td>
+                <td>Fast — Divide &amp; Conquer</td>
+              </tr>
+              <tr class="fast-row">
+                <td>Quick Sort</td>
+                <td>O(n log n)</td>
+                <td>Fast — Divide &amp; Conquer</td>
+              </tr>
+              <tr class="fast-row">
+                <td>Shell Sort</td>
+                <td>O(n log² n)</td>
+                <td>Fast — Gap-based insertion</td>
+              </tr>
+            </tbody>
+          </table>
+        </div>
+        <div
+          style="background:#fff8f0;border-left:4px solid #c45e00;border-radius:0 8px 8px 0;padding:12px 16px;margin-top:12px">
+          <p style="color:#7c3800;font-size:16px"><strong>Naive sorts</strong> work by repeatedly comparing and shifting
+            adjacent elements one step at a time. They are simple to understand and implement, but slow — every element
+            may need to travel across the entire array, leading to O(n²) time. Fine for small datasets; impractical for
+            large ones.</p>
+        </div>
+        <div style="display:grid;grid-template-columns:1fr 1fr 1fr;gap:8px;margin-top:10px">
+          <div style="background:#f0fdf4;border:1px solid #bbf7d0;border-radius:8px;padding:10px 12px">
+            <div style="display:flex;align-items:baseline;gap:6px;margin-bottom:4px">
+              <span
+                style="font-family:'JetBrains Mono',monospace;font-size:11px;font-weight:700;color:#15803d;letter-spacing:.06em;text-transform:uppercase">Best
+                case</span>
+              <span style="font-family:'JetBrains Mono',monospace;font-size:17px;font-weight:700;color:#15803d">Ω</span>
+            </div>
+            <p style="font-size:14px;color:#475569;line-height:1.4">Most <strong>favourable</strong> input (e.g. already
+              sorted). <strong>Lower bound</strong> — the algorithm does at least this much work.</p>
+          </div>
+          <div style="background:#fefce8;border:1px solid #fde68a;border-radius:8px;padding:10px 12px">
+            <div style="display:flex;align-items:baseline;gap:6px;margin-bottom:4px">
+              <span
+                style="font-family:'JetBrains Mono',monospace;font-size:11px;font-weight:700;color:#b45309;letter-spacing:.06em;text-transform:uppercase">Average
+                case</span>
+              <span style="font-family:'JetBrains Mono',monospace;font-size:17px;font-weight:700;color:#b45309">Θ</span>
+            </div>
+            <p style="font-size:14px;color:#475569;line-height:1.4">Expected performance on <strong>random</strong>
+              input. <strong>Tight bound</strong> — both upper and lower, most useful for real-world comparison.</p>
+          </div>
+          <div style="background:#fff1f2;border:1px solid #fecdd3;border-radius:8px;padding:10px 12px">
+            <div style="display:flex;align-items:baseline;gap:6px;margin-bottom:4px">
+              <span
+                style="font-family:'JetBrains Mono',monospace;font-size:11px;font-weight:700;color:#be123c;letter-spacing:.06em;text-transform:uppercase">Worst
+                case</span>
+              <span style="font-family:'JetBrains Mono',monospace;font-size:17px;font-weight:700;color:#be123c">O</span>
+            </div>
+            <p style="font-size:14px;color:#475569;line-height:1.4">Most <strong>unfavourable</strong> input (e.g.
+              reverse sorted). <strong>Upper bound</strong> — the algorithm does at most this much work.</p>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <!-- ═══ SLIDE 5: Merge Sort concept + diagram ═══ -->
+    <div class="slide">
+      <div class="pad">
+        <div class="stag">Fast sorting algorithm</div>
+        <h2>Merge <span class="accent">Sort</span></h2>
+        <div class="accent-line"></div>
+        <div class="tags">
+          <span class="tag ti">Stable</span>
+          <span class="tag ti">O(n log n) all cases</span>
+          <span class="tag to">Extra space O(n)</span>
+        </div>
+        <p class="desc"><strong>How it works:</strong> Recursively split the array in half until each part has one
+          element (trivially sorted). Then repeatedly merge adjacent sorted parts into larger sorted parts.</p>
+        <div id="ms-step-body" style="flex:1;display:flex;flex-direction:column;justify-content:center;min-height:0">
+          <div class="ms" id="ms0">
+            <div class="diagram-step">
+              <div class="step-label">Step 1 — Original</div>
+              <div class="arr-row">
+                <div class="cell">38</div>
+                <div class="cell">27</div>
+                <div class="cell">43</div>
+                <div class="cell">3</div>
+                <div class="cell">9</div>
+                <div class="cell">82</div>
+              </div>
+            </div>
+            <p class="desc" style="margin-top:12px">An unsorted array of 6 elements. We will recursively split until
+              each part is trivially sorted (1 element).</p>
+          </div>
+          <div class="ms" id="ms1" style="display:none">
+            <div class="diagram-step">
+              <div class="step-label">Step 2 — Split into halves</div>
+              <div class="arr-row">
+                <div class="cell active">38</div>
+                <div class="cell active">27</div>
+                <div class="cell active">43</div>
+                <div class="arr-sep">|</div>
+                <div class="cell active">3</div>
+                <div class="cell active">9</div>
+                <div class="cell active">82</div>
+              </div>
+            </div>
+            <p class="desc" style="margin-top:12px">Divide the array at the midpoint into two halves: [38, 27, 43] and
+              [3, 9, 82].</p>
+          </div>
+          <div class="ms" id="ms2" style="display:none">
+            <div class="diagram-step">
+              <div class="step-label">Step 3 — Split to single elements</div>
+              <div class="arr-row">
+                <div class="cell">38</div>
+                <div class="arr-sep">|</div>
+                <div class="cell">27</div>
+                <div class="arr-sep">|</div>
+                <div class="cell">43</div>
+                <div class="arr-sep">‖</div>
+                <div class="cell">3</div>
+                <div class="arr-sep">|</div>
+                <div class="cell">9</div>
+                <div class="arr-sep">|</div>
+                <div class="cell">82</div>
+              </div>
+            </div>
+            <p class="desc" style="margin-top:12px">Keep splitting recursively until each subarray has exactly one
+              element — a single element is always sorted (base case).</p>
+          </div>
+          <div class="ms" id="ms3" style="display:none">
+            <div class="diagram-step">
+              <div class="step-label">Step 4 — Merge sorted pairs</div>
+              <div class="arr-row">
+                <div class="cell sorted">27</div>
+                <div class="cell sorted">38</div>
+                <div class="cell sorted">43</div>
+                <div class="arr-sep">|</div>
+                <div class="cell sorted">3</div>
+                <div class="cell sorted">9</div>
+                <div class="cell sorted">82</div>
+              </div>
+            </div>
+            <p class="desc" style="margin-top:12px">Merge adjacent pairs by comparing elements one by one and placing
+              the smaller first. Each half is now sorted.</p>
+          </div>
+          <div class="ms" id="ms4" style="display:none">
+            <div class="diagram-step">
+              <div class="step-label">Step 5 — Final merge</div>
+              <div class="arr-row">
+                <div class="cell sorted">3</div>
+                <div class="cell sorted">9</div>
+                <div class="cell sorted">27</div>
+                <div class="cell sorted">38</div>
+                <div class="cell sorted">43</div>
+                <div class="cell sorted">82</div>
+              </div>
+            </div>
+            <p class="desc" style="margin-top:12px">Merge the two sorted halves into the final sorted array. Done!</p>
+          </div>
+          <div class="ms" id="ms5" style="display:none">
+            <div class="flow-tree">
+              <div class="flow-lbl">Original</div>
+              <div class="flow-row">
+                <div class="cell">38</div>
+                <div class="cell">27</div>
+                <div class="cell">43</div>
+                <div class="cell">3</div>
+                <div class="cell">9</div>
+                <div class="cell">82</div>
+              </div>
+              <div class="flow-arrow">&#8595; split</div>
+              <div class="flow-branch">
+                <div>
+                  <div class="flow-row">
+                    <div class="cell active">38</div>
+                    <div class="cell active">27</div>
+                    <div class="cell active">43</div>
+                  </div>
+                  <div class="flow-arrow">&#8595;</div>
+                  <div class="flow-branch">
+                    <div>
+                      <div class="flow-row">
+                        <div class="cell">38</div>
+                      </div>
+                    </div>
+                    <div>
+                      <div class="flow-row">
+                        <div class="cell active">27</div>
+                        <div class="cell active">43</div>
+                      </div>
+                      <div class="flow-arrow">&#8595;</div>
+                      <div class="flow-row">
+                        <div class="cell">27</div>
+                      </div>
+                      <div class="flow-row">
+                        <div class="cell">43</div>
+                      </div>
+                    </div>
+                  </div>
+                  <div class="flow-arrow">&#8593; merge</div>
+                  <div class="flow-row">
+                    <div class="cell sorted">27</div>
+                    <div class="cell sorted">38</div>
+                    <div class="cell sorted">43</div>
+                  </div>
+                </div>
+                <div>
+                  <div class="flow-row">
+                    <div class="cell active">3</div>
+                    <div class="cell active">9</div>
+                    <div class="cell active">82</div>
+                  </div>
+                  <div class="flow-arrow">&#8595;</div>
+                  <div class="flow-branch">
+                    <div>
+                      <div class="flow-row">
+                        <div class="cell">3</div>
+                      </div>
+                    </div>
+                    <div>
+                      <div class="flow-row">
+                        <div class="cell active">9</div>
+                        <div class="cell active">82</div>
+                      </div>
+                      <div class="flow-arrow">&#8595;</div>
+                      <div class="flow-row">
+                        <div class="cell">9</div>
+                      </div>
+                      <div class="flow-row">
+                        <div class="cell">82</div>
+                      </div>
+                    </div>
+                  </div>
+                  <div class="flow-arrow">&#8593; merge</div>
+                  <div class="flow-row">
+                    <div class="cell sorted">3</div>
+                    <div class="cell sorted">9</div>
+                    <div class="cell sorted">82</div>
+                  </div>
+                </div>
+              </div>
+              <div class="flow-arrow">&#8593; final merge</div>
+              <div class="flow-row">
+                <div class="cell sorted">3</div>
+                <div class="cell sorted">9</div>
+                <div class="cell sorted">27</div>
+                <div class="cell sorted">38</div>
+                <div class="cell sorted">43</div>
+                <div class="cell sorted">82</div>
+              </div>
+            </div>
+            <p class="desc" style="margin-top:8px">Complete overview: split recursively until single elements, then
+              merge back up in sorted order.</p>
+          </div>
+        </div>
+        <div class="step-nav">
+          <button class="step-btn" id="ms-step-prev" onclick="msNav(-1)" disabled>&larr; Prev</button>
+          <span class="step-ctr" id="ms-nav-ctr">1 / 6</span>
+          <button class="step-btn" id="ms-step-next" onclick="msNav(1)">Next &rarr;</button>
+        </div>
+      </div>
+    </div>
+
+    <!-- ═══ SLIDE 6: Merge Sort Live Animation ═══ -->
+    <div class="slide">
+      <div class="pad">
+        <div class="stag">Fast sorting algorithm</div>
+        <h2>Merge Sort — <span class="accent">Live Animation</span></h2>
+        <div class="accent-line"></div>
+        <div class="tags">
+          <span class="tag ti">Divide → Merge</span>
+          <span class="tag tg">Pseudocode synced</span>
+        </div>
+
+        <div class="anim-body">
+          <div class="anim-left">
+            <p class="anim-desc" id="ms-desc">Press ▶ to play, or drag the timeline to any point.</p>
+            <div class="bar-wrap" id="ms-bar-wrap"></div>
+          </div>
+          <div class="anim-right">
+            <div class="ps-wrap">
+              <div class="ps-head"><span class="ps-lang">Pseudocode — Merge Sort</span></div>
+              <div class="ps-body" id="ms-ps-body"></div>
+            </div>
+          </div>
+        </div>
+
+        <div class="ctrl-bar">
+          <button class="ctrl-btn primary" id="ms-play-btn" onclick="msTogglePlay()">▶</button>
+          <button class="ctrl-btn" onclick="msReset()">↺</button>
+          <div class="speed-wrap">
+            <label>Speed</label>
+            <input type="range" class="speed-input" id="ms-speed" min="1" max="5" value="3">
+          </div>
+          <div class="tl-wrap">
+            <input type="range" class="tl-input" id="ms-timeline" min="0" value="0" oninput="msOnScrub(this.value)"
+              onmousedown="msPauseScrub()" onmouseup="msAfterScrub()">
+          </div>
+          <span class="step-counter" id="ms-step-ctr">1 / –</span>
+        </div>
+      </div>
+    </div>
+
+    <!-- ═══ SLIDE 7: Merge Sort code ═══ -->
+    <div class="slide">
+      <div class="pad">
+        <div class="stag">Fast sorting algorithm</div>
+        <h2>Merge Sort — <span class="accent">Implementation</span></h2>
+        <div class="accent-line"></div>
+        <div class="two-col">
+          <div class="code-wrap pseudo">
+            <div class="code-head"><span class="code-lang">Pseudocode</span></div>
+            <pre><span class="kw">function</span> <span class="fn">MERGE-SORT</span>(arr):
+  <span class="kw">if</span> len(arr) &lt;= 1:
+    <span class="kw">return</span> arr
+  mid = len(arr) / 2
+  left  = <span class="fn">MERGE-SORT</span>(arr[0..mid])
+  right = <span class="fn">MERGE-SORT</span>(arr[mid..end])
+  <span class="kw">return</span> <span class="fn">MERGE</span>(left, right)
+
+<span class="kw">function</span> <span class="fn">MERGE</span>(left, right):
+  result = []
+  i = 0, j = 0
+  <span class="kw">while</span> i &lt; len(left) <span class="kw">and</span> j &lt; len(right):
+    <span class="kw">if</span> left[i] &lt;= right[j]:
+      result.append(left[i]); i++
+    <span class="kw">else</span>:
+      result.append(right[j]); j++
+  <span class="cm">// append remaining</span>
+  result += left[i:] + right[j:]
+  <span class="kw">return</span> result</pre>
+          </div>
+          <div class="code-wrap">
+            <div class="code-head"><span class="code-lang">Python</span></div>
+            <pre><span class="kw">def</span> <span class="fn">merge_sort</span>(arr):
+  <span class="kw">if</span> len(arr) &lt;= <span class="nm">1</span>:
+    <span class="kw">return</span> arr
+  mid = len(arr) // <span class="nm">2</span>
+  left  = <span class="fn">merge_sort</span>(arr[:mid])
+  right = <span class="fn">merge_sort</span>(arr[mid:])
+  <span class="kw">return</span> <span class="fn">merge</span>(left, right)
+
+<span class="kw">def</span> <span class="fn">merge</span>(left, right):
+  result = []
+  i = j = <span class="nm">0</span>
+  <span class="kw">while</span> i &lt; len(left) <span class="kw">and</span> j &lt; len(right):
+    <span class="kw">if</span> left[i] &lt;= right[j]:
+      result.append(left[i]); i += <span class="nm">1</span>
+    <span class="kw">else</span>:
+      result.append(right[j]); j += <span class="nm">1</span>
+  result += left[i:] + right[j:]
+  <span class="kw">return</span> result
+
+<span class="cm"># → [3, 9, 27, 38, 43, 82]</span></pre>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <!-- ═══ SLIDE 7: Quick Sort concept + diagram ═══ -->
+    <div class="slide">
+      <div class="pad">
+        <div class="stag">Fast sorting algorithm</div>
+        <h2>Quick <span class="accent">Sort</span></h2>
+        <div class="accent-line"></div>
+        <div class="tags">
+          <span class="tag ti">In-place</span>
+          <span class="tag ti">O(n log n) average</span>
+          <span class="tag to">O(n²) worst case</span>
+          <span class="tag tn">Not stable</span>
+        </div>
+        <p class="desc"><strong>How it works:</strong> Choose a <em>pivot</em> element. Partition so all elements
+          smaller come before it, all larger after. Recursively sort both partitions.</p>
+        <div id="qs-step-body" style="flex:1;display:flex;flex-direction:column;justify-content:center;min-height:0">
+          <div class="qss" id="qs0">
+            <div class="diagram-step">
+              <div class="step-label">Step 1 — Original, pivot = last element</div>
+              <div class="arr-row">
+                <div class="cell">10</div>
+                <div class="cell">80</div>
+                <div class="cell">30</div>
+                <div class="cell">90</div>
+                <div class="cell">40</div>
+                <div class="cell">50</div>
+                <div class="cell pivot">70</div><span class="arr-label">pivot = 70</span>
+              </div>
+            </div>
+            <p class="desc" style="margin-top:12px">Choose the last element (70) as the pivot. We will partition around
+              it.</p>
+          </div>
+          <div class="qss" id="qs1" style="display:none">
+            <div class="diagram-step">
+              <div class="step-label">Step 2 — Partition: &lt; 70 left, &gt; 70 right</div>
+              <div class="arr-row">
+                <div class="cell active">10</div>
+                <div class="cell active">30</div>
+                <div class="cell active">40</div>
+                <div class="cell active">50</div>
+                <div class="cell pivot">70</div>
+                <div class="cell active">80</div>
+                <div class="cell active">90</div><span class="arr-label">pivot in place</span>
+              </div>
+            </div>
+            <p class="desc" style="margin-top:12px">Scan from left: elements &le; 70 go left, elements &gt; 70 go right.
+              Pivot lands in its final sorted position.</p>
+          </div>
+          <div class="qss" id="qs2" style="display:none">
+            <div class="diagram-step">
+              <div class="step-label">Step 3 — Recurse on left partition [10,30,40,50]</div>
+              <div class="arr-row">
+                <div class="cell active">10</div>
+                <div class="cell active">30</div>
+                <div class="cell active">40</div>
+                <div class="cell pivot">50</div>
+                <div class="cell sorted">70</div>
+                <div class="cell active">80</div>
+                <div class="cell active">90</div>
+              </div>
+            </div>
+            <p class="desc" style="margin-top:12px">Recursively apply QuickSort to [10, 30, 40, 50]. Pivot 50 lands in
+              place. Right partition [80, 90] is already sorted.</p>
+          </div>
+          <div class="qss" id="qs3" style="display:none">
+            <div class="diagram-step">
+              <div class="step-label">Step 4 — Fully sorted</div>
+              <div class="arr-row">
+                <div class="cell sorted">10</div>
+                <div class="cell sorted">30</div>
+                <div class="cell sorted">40</div>
+                <div class="cell sorted">50</div>
+                <div class="cell sorted">70</div>
+                <div class="cell sorted">80</div>
+                <div class="cell sorted">90</div>
+              </div>
+            </div>
+            <p class="desc" style="margin-top:12px">All partitions are trivially sorted or already in place. The array
+              is now fully sorted!</p>
+          </div>
+          <div class="qss" id="qs4" style="display:none">
+            <div class="flow-tree">
+              <div class="flow-lbl">Original &mdash; pivot = 70</div>
+              <div class="flow-row">
+                <div class="cell">10</div>
+                <div class="cell">80</div>
+                <div class="cell">30</div>
+                <div class="cell">90</div>
+                <div class="cell">40</div>
+                <div class="cell">50</div>
+                <div class="cell pivot">70</div>
+              </div>
+              <div class="flow-arrow">&#8595; partition</div>
+              <div class="flow-row">
+                <div class="cell active">10</div>
+                <div class="cell active">30</div>
+                <div class="cell active">40</div>
+                <div class="cell active">50</div>
+                <div class="flow-sep">|</div>
+                <div class="cell pivot">70</div>
+                <div class="flow-sep">|</div>
+                <div class="cell active">80</div>
+                <div class="cell active">90</div>
+              </div>
+              <div class="flow-arrow">&#8595; recurse left (pivot=50)</div>
+              <div class="flow-branch">
+                <div>
+                  <div class="flow-row">
+                    <div class="cell active">10</div>
+                    <div class="cell active">30</div>
+                    <div class="cell active">40</div>
+                    <div class="flow-sep">|</div>
+                    <div class="cell pivot">50</div>
+                  </div>
+                  <div class="flow-arrow">&#8595; pivot=40</div>
+                  <div class="flow-row">
+                    <div class="cell active">10</div>
+                    <div class="cell active">30</div>
+                    <div class="flow-sep">|</div>
+                    <div class="cell pivot">40</div>
+                    <div class="flow-sep">|</div>
+                    <div class="cell pivot">50</div>
+                  </div>
+                  <div class="flow-arrow">&#8595; done</div>
+                  <div class="flow-row">
+                    <div class="cell sorted">10</div>
+                    <div class="cell sorted">30</div>
+                    <div class="cell sorted">40</div>
+                    <div class="cell sorted">50</div>
+                  </div>
+                </div>
+                <div>
+                  <div class="flow-lbl">right</div>
+                  <div class="flow-row">
+                    <div class="cell active">80</div>
+                    <div class="cell active">90</div>
+                  </div>
+                  <div class="flow-arrow">&#8595; done</div>
+                  <div class="flow-row">
+                    <div class="cell sorted">80</div>
+                    <div class="cell sorted">90</div>
+                  </div>
+                </div>
+              </div>
+              <div class="flow-arrow">&#8593; combine</div>
+              <div class="flow-row">
+                <div class="cell sorted">10</div>
+                <div class="cell sorted">30</div>
+                <div class="cell sorted">40</div>
+                <div class="cell sorted">50</div>
+                <div class="cell sorted">70</div>
+                <div class="cell sorted">80</div>
+                <div class="cell sorted">90</div>
+              </div>
+            </div>
+            <p class="desc" style="margin-top:8px">Complete overview: pick pivot, partition, recurse on each side,
+              combine sorted partitions.</p>
+          </div>
+        </div>
+        <div class="step-nav">
+          <button class="step-btn" id="qs-step-prev" onclick="qsStepNav(-1)" disabled>&larr; Prev</button>
+          <span class="step-ctr" id="qs-nav-ctr">1 / 5</span>
+          <button class="step-btn" id="qs-step-next" onclick="qsStepNav(1)">Next &rarr;</button>
+        </div>
+      </div>
+    </div>
+
+    <!-- ═══ SLIDE 10: Quick Sort Live Animation ═══ -->
+    <div class="slide">
+      <div class="pad">
+        <div class="stag">Fast sorting algorithm</div>
+        <h2>Quick Sort — <span class="accent">Live Animation</span></h2>
+        <div class="accent-line"></div>
+        <div class="tags">
+          <span class="tag ti">Lomuto partition</span>
+          <span class="tag to">Pivot = last element</span>
+          <span class="tag tg">Pseudocode synced</span>
+        </div>
+
+        <div class="anim-body">
+          <div class="anim-left">
+            <p class="anim-desc" id="qs-desc">Press ▶ to play, or drag the timeline to any point.</p>
+            <div class="bar-wrap" id="qs-bar-wrap"></div>
+          </div>
+          <div class="anim-right">
+            <div class="ps-wrap">
+              <div class="ps-head"><span class="ps-lang">Pseudocode — Quick Sort</span></div>
+              <div class="ps-body" id="qs-ps-body"></div>
+            </div>
+          </div>
+        </div>
+
+        <div class="ctrl-bar">
+          <button class="ctrl-btn primary" id="qs-play-btn" onclick="qsTogglePlay()">▶</button>
+          <button class="ctrl-btn" onclick="qsReset()">↺</button>
+          <div class="speed-wrap">
+            <label>Speed</label>
+            <input type="range" class="speed-input" id="qs-speed" min="1" max="5" value="3">
+          </div>
+          <div class="tl-wrap">
+            <input type="range" class="tl-input" id="qs-timeline" min="0" value="0" oninput="qsOnScrub(this.value)"
+              onmousedown="qsPauseScrub()" onmouseup="qsAfterScrub()">
+          </div>
+          <span class="step-counter" id="qs-step-ctr">1 / –</span>
+        </div>
+      </div>
+    </div>
+
+    <!-- ═══ SLIDE 11: Quick Sort code ═══ -->
+    <div class="slide">
+      <div class="pad">
+        <div class="stag">Fast sorting algorithm</div>
+        <h2>Quick Sort — <span class="accent">Implementation</span></h2>
+        <div class="accent-line"></div>
+        <div class="two-col">
+          <div class="code-wrap pseudo">
+            <div class="code-head"><span class="code-lang">Pseudocode (Lomuto partition)</span></div>
+            <pre><span class="kw">function</span> <span class="fn">QUICKSORT</span>(arr, low, high):
+  <span class="kw">if</span> low &lt; high:
+    pi = <span class="fn">PARTITION</span>(arr, low, high)
+    <span class="fn">QUICKSORT</span>(arr, low, pi - 1)
+    <span class="fn">QUICKSORT</span>(arr, pi + 1, high)
+
+<span class="kw">function</span> <span class="fn">PARTITION</span>(arr, low, high):
+  pivot = arr[high]
+  i = low - 1
+  <span class="kw">for</span> j = low <span class="kw">to</span> high - 1:
+    <span class="kw">if</span> arr[j] &lt;= pivot:
+      i = i + 1
+      <span class="fn">SWAP</span>(arr[i], arr[j])
+  <span class="fn">SWAP</span>(arr[i+1], arr[high])
+  <span class="kw">return</span> i + 1</pre>
+          </div>
+          <div class="code-wrap">
+            <div class="code-head"><span class="code-lang">Python</span></div>
+            <pre><span class="kw">def</span> <span class="fn">quick_sort</span>(arr, low, high):
+  <span class="kw">if</span> low &lt; high:
+    pi = <span class="fn">partition</span>(arr, low, high)
+    <span class="fn">quick_sort</span>(arr, low, pi - <span class="nm">1</span>)
+    <span class="fn">quick_sort</span>(arr, pi + <span class="nm">1</span>, high)
+
+<span class="kw">def</span> <span class="fn">partition</span>(arr, low, high):
+  pivot = arr[high]
+  i = low - <span class="nm">1</span>
+  <span class="kw">for</span> j <span class="kw">in</span> range(low, high):
+    <span class="kw">if</span> arr[j] &lt;= pivot:
+      i += <span class="nm">1</span>
+      arr[i], arr[j] = arr[j], arr[i]
+  arr[i+<span class="nm">1</span>], arr[high] = arr[high], arr[i+<span class="nm">1</span>]
+  <span class="kw">return</span> i + <span class="nm">1</span>
+
+<span class="cm"># Example</span>
+arr = [<span class="nm">10</span>,<span class="nm">80</span>,<span class="nm">30</span>,<span class="nm">90</span>,<span class="nm">40</span>,<span class="nm">50</span>,<span class="nm">70</span>]
+<span class="fn">quick_sort</span>(arr, <span class="nm">0</span>, len(arr)-<span class="nm">1</span>)
+<span class="cm"># → [10, 30, 40, 50, 70, 80, 90]</span></pre>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <!-- ═══ SLIDE 9: Shell Sort Gap Passes ═══ -->
+    <div class="slide">
+      <div class="pad">
+        <div class="stag">Fast sorting algorithm</div>
+        <h2>Shell Sort — <span class="accent">Gap Passes</span></h2>
+        <div class="accent-line"></div>
+        <div class="tags">
+          <span class="tag ti">In-place</span><span class="tag ti">Gap-sequence dependent</span><span class="tag to">Not
+            stable</span>
+        </div>
+
+        <div id="ss-body" style="flex:1;display:flex;flex-direction:column;justify-content:center;min-height:0">
+
+          <div class="ss" id="ss0">
+            <div class="step-label">Original array — 8 elements, unsorted</div>
+            <div class="arr-row">
+              <div class="cell">23</div>
+              <div class="cell">29</div>
+              <div class="cell">15</div>
+              <div class="cell">3</div>
+              <div class="cell">5</div>
+              <div class="cell">44</div>
+              <div class="cell">7</div>
+              <div class="cell">36</div>
+            </div>
+            <p class="desc" style="margin-top:16px">We use gaps <strong>4 → 2 → 1</strong>. Each pass runs insertion
+              sort comparing elements <em>gap</em> positions apart — large gaps move elements far quickly, gap=1
+              finishes with minimal work.</p>
+          </div>
+
+          <div class="ss" id="ss1" style="display:none">
+            <div class="step-label">Gap = 4 — colour-coded: same colour = same group</div>
+            <div class="arr-row">
+              <div class="cell sm" style="background:#ede9fe;border-color:#8b5cf6;color:#5b21b6">23</div>
+              <div class="cell sm" style="background:#ffedd5;border-color:#f97316;color:#c2410c">29</div>
+              <div class="cell sm" style="background:#dbeafe;border-color:#3b82f6;color:#1d4ed8">15</div>
+              <div class="cell sm" style="background:#dcfce7;border-color:#22c55e;color:#15803d">3</div>
+              <div class="cell sm" style="background:#ede9fe;border-color:#8b5cf6;color:#5b21b6">5</div>
+              <div class="cell sm" style="background:#ffedd5;border-color:#f97316;color:#c2410c">44</div>
+              <div class="cell sm" style="background:#dbeafe;border-color:#3b82f6;color:#1d4ed8">7</div>
+              <div class="cell sm" style="background:#dcfce7;border-color:#22c55e;color:#15803d">36</div>
+            </div>
+            <div class="group-grid" style="margin-top:16px">
+              <div class="group-box g0">
+                <div class="group-label">Group 1 — idx 0, 4</div>
+                <div class="arr-row">
+                  <div class="cell sm" style="background:#ede9fe;border-color:#8b5cf6;color:#5b21b6">23</div>
+                  <div class="cell sm" style="background:#ede9fe;border-color:#8b5cf6;color:#5b21b6">5</div>
+                </div>
+              </div>
+              <div class="group-box g1">
+                <div class="group-label">Group 2 — idx 1, 5</div>
+                <div class="arr-row">
+                  <div class="cell sm" style="background:#ffedd5;border-color:#f97316;color:#c2410c">29</div>
+                  <div class="cell sm" style="background:#ffedd5;border-color:#f97316;color:#c2410c">44</div>
+                </div>
+              </div>
+              <div class="group-box g2">
+                <div class="group-label">Group 3 — idx 2, 6</div>
+                <div class="arr-row">
+                  <div class="cell sm" style="background:#dbeafe;border-color:#3b82f6;color:#1d4ed8">15</div>
+                  <div class="cell sm" style="background:#dbeafe;border-color:#3b82f6;color:#1d4ed8">7</div>
+                </div>
+              </div>
+              <div class="group-box g3">
+                <div class="group-label">Group 4 — idx 3, 7</div>
+                <div class="arr-row">
+                  <div class="cell sm" style="background:#dcfce7;border-color:#22c55e;color:#15803d">3</div>
+                  <div class="cell sm" style="background:#dcfce7;border-color:#22c55e;color:#15803d">36</div>
+                </div>
+              </div>
+            </div>
+            <p class="desc" style="margin-top:12px">Each group is insertion-sorted <strong>independently</strong>.</p>
+          </div>
+
+          <div class="ss" id="ss2" style="display:none">
+            <div class="step-label">Gap = 4 — each group sorted (before → after)</div>
+            <div class="group-grid">
+              <div class="group-box g0">
+                <div class="group-label">Group 1</div>
+                <div class="group-row">
+                  <div class="arr-row">
+                    <div class="cell sm" style="background:#ede9fe;border-color:#8b5cf6;color:#5b21b6">23</div>
+                    <div class="cell sm" style="background:#ede9fe;border-color:#8b5cf6;color:#5b21b6">5</div>
+                  </div><span class="g-arrow">→</span>
+                  <div class="arr-row">
+                    <div class="cell sm" style="background:#ede9fe;border-color:#8b5cf6;color:#5b21b6">5</div>
+                    <div class="cell sm" style="background:#ede9fe;border-color:#8b5cf6;color:#5b21b6">23</div>
+                  </div><span style="font-size:12px;color:#22c55e;font-weight:700;margin-left:4px">swap ✓</span>
+                </div>
+              </div>
+              <div class="group-box g1">
+                <div class="group-label">Group 2</div>
+                <div class="group-row">
+                  <div class="arr-row">
+                    <div class="cell sm" style="background:#ffedd5;border-color:#f97316;color:#c2410c">29</div>
+                    <div class="cell sm" style="background:#ffedd5;border-color:#f97316;color:#c2410c">44</div>
+                  </div><span class="g-arrow">→</span>
+                  <div class="arr-row">
+                    <div class="cell sm" style="background:#ffedd5;border-color:#f97316;color:#c2410c">29</div>
+                    <div class="cell sm" style="background:#ffedd5;border-color:#f97316;color:#c2410c">44</div>
+                  </div><span style="font-size:12px;color:#94a3b8;margin-left:4px">no swap</span>
+                </div>
+              </div>
+              <div class="group-box g2">
+                <div class="group-label">Group 3</div>
+                <div class="group-row">
+                  <div class="arr-row">
+                    <div class="cell sm" style="background:#dbeafe;border-color:#3b82f6;color:#1d4ed8">15</div>
+                    <div class="cell sm" style="background:#dbeafe;border-color:#3b82f6;color:#1d4ed8">7</div>
+                  </div><span class="g-arrow">→</span>
+                  <div class="arr-row">
+                    <div class="cell sm" style="background:#dbeafe;border-color:#3b82f6;color:#1d4ed8">7</div>
+                    <div class="cell sm" style="background:#dbeafe;border-color:#3b82f6;color:#1d4ed8">15</div>
+                  </div><span style="font-size:12px;color:#22c55e;font-weight:700;margin-left:4px">swap ✓</span>
+                </div>
+              </div>
+              <div class="group-box g3">
+                <div class="group-label">Group 4</div>
+                <div class="group-row">
+                  <div class="arr-row">
+                    <div class="cell sm" style="background:#dcfce7;border-color:#22c55e;color:#15803d">3</div>
+                    <div class="cell sm" style="background:#dcfce7;border-color:#22c55e;color:#15803d">36</div>
+                  </div><span class="g-arrow">→</span>
+                  <div class="arr-row">
+                    <div class="cell sm" style="background:#dcfce7;border-color:#22c55e;color:#15803d">3</div>
+                    <div class="cell sm" style="background:#dcfce7;border-color:#22c55e;color:#15803d">36</div>
+                  </div><span style="font-size:12px;color:#94a3b8;margin-left:4px">no swap</span>
+                </div>
+              </div>
+            </div>
+          </div>
+
+          <div class="ss" id="ss3" style="display:none">
+            <div class="step-label">Gap = 4 result — woven back together</div>
+            <div class="arr-row">
+              <div class="cell" style="background:#ede9fe;border-color:#8b5cf6;color:#5b21b6">5</div>
+              <div class="cell" style="background:#ffedd5;border-color:#f97316;color:#c2410c">29</div>
+              <div class="cell" style="background:#dbeafe;border-color:#3b82f6;color:#1d4ed8">7</div>
+              <div class="cell" style="background:#dcfce7;border-color:#22c55e;color:#15803d">3</div>
+              <div class="cell" style="background:#ede9fe;border-color:#8b5cf6;color:#5b21b6">23</div>
+              <div class="cell" style="background:#ffedd5;border-color:#f97316;color:#c2410c">44</div>
+              <div class="cell" style="background:#dbeafe;border-color:#3b82f6;color:#1d4ed8">15</div>
+              <div class="cell" style="background:#dcfce7;border-color:#22c55e;color:#15803d">36</div>
+            </div>
+            <p class="desc" style="margin-top:16px">Not fully sorted — but every element is much closer to its final
+              position. Now shrink gap to <strong>2</strong>.</p>
+          </div>
+
+          <div class="ss" id="ss4" style="display:none">
+            <div class="step-label">Gap = 2 — 2 groups, each sorted</div>
+            <div class="group-grid" style="flex-wrap:nowrap">
+              <div class="group-box g0" style="flex:1">
+                <div class="group-label">Group 1 — idx 0, 2, 4, 6</div>
+                <div class="group-row">
+                  <div class="arr-row">
+                    <div class="cell sm" style="background:#ede9fe;border-color:#8b5cf6;color:#5b21b6">5</div>
+                    <div class="cell sm" style="background:#ede9fe;border-color:#8b5cf6;color:#5b21b6">7</div>
+                    <div class="cell sm" style="background:#ede9fe;border-color:#8b5cf6;color:#5b21b6">23</div>
+                    <div class="cell sm" style="background:#ede9fe;border-color:#8b5cf6;color:#5b21b6">15</div>
+                  </div><span class="g-arrow">→</span>
+                  <div class="arr-row">
+                    <div class="cell sm" style="background:#ede9fe;border-color:#8b5cf6;color:#5b21b6">5</div>
+                    <div class="cell sm" style="background:#ede9fe;border-color:#8b5cf6;color:#5b21b6">7</div>
+                    <div class="cell sm" style="background:#ede9fe;border-color:#8b5cf6;color:#5b21b6">15</div>
+                    <div class="cell sm" style="background:#ede9fe;border-color:#8b5cf6;color:#5b21b6">23</div>
+                  </div>
+                </div>
+              </div>
+              <div class="group-box g1" style="flex:1">
+                <div class="group-label">Group 2 — idx 1, 3, 5, 7</div>
+                <div class="group-row">
+                  <div class="arr-row">
+                    <div class="cell sm" style="background:#ffedd5;border-color:#f97316;color:#c2410c">29</div>
+                    <div class="cell sm" style="background:#ffedd5;border-color:#f97316;color:#c2410c">3</div>
+                    <div class="cell sm" style="background:#ffedd5;border-color:#f97316;color:#c2410c">44</div>
+                    <div class="cell sm" style="background:#ffedd5;border-color:#f97316;color:#c2410c">36</div>
+                  </div><span class="g-arrow">→</span>
+                  <div class="arr-row">
+                    <div class="cell sm" style="background:#ffedd5;border-color:#f97316;color:#c2410c">3</div>
+                    <div class="cell sm" style="background:#ffedd5;border-color:#f97316;color:#c2410c">29</div>
+                    <div class="cell sm" style="background:#ffedd5;border-color:#f97316;color:#c2410c">36</div>
+                    <div class="cell sm" style="background:#ffedd5;border-color:#f97316;color:#c2410c">44</div>
+                  </div>
+                </div>
+              </div>
+            </div>
+          </div>
+
+          <div class="ss" id="ss5" style="display:none">
+            <div class="step-label">Gap = 2 result — nearly sorted</div>
+            <div class="arr-row">
+              <div class="cell" style="background:#ede9fe;border-color:#8b5cf6;color:#5b21b6">5</div>
+              <div class="cell" style="background:#ffedd5;border-color:#f97316;color:#c2410c">3</div>
+              <div class="cell" style="background:#ede9fe;border-color:#8b5cf6;color:#5b21b6">7</div>
+              <div class="cell" style="background:#ffedd5;border-color:#f97316;color:#c2410c">29</div>
+              <div class="cell" style="background:#ede9fe;border-color:#8b5cf6;color:#5b21b6">15</div>
+              <div class="cell" style="background:#ffedd5;border-color:#f97316;color:#c2410c">36</div>
+              <div class="cell" style="background:#ede9fe;border-color:#8b5cf6;color:#5b21b6">23</div>
+              <div class="cell" style="background:#ffedd5;border-color:#f97316;color:#c2410c">44</div>
+            </div>
+            <p class="desc" style="margin-top:16px">Only 3 is far out of place. Gap=1 fixes this in <strong>very few
+                comparisons</strong>.</p>
+          </div>
+
+          <div class="ss" id="ss6" style="display:none">
+            <div class="step-label">Gap = 1 — regular insertion sort on a nearly-sorted array</div>
+            <div class="arr-row">
+              <div class="cell sorted">3</div>
+              <div class="cell sorted">5</div>
+              <div class="cell sorted">7</div>
+              <div class="cell sorted">15</div>
+              <div class="cell sorted">23</div>
+              <div class="cell sorted">29</div>
+              <div class="cell sorted">36</div>
+              <div class="cell sorted">44</div>
+            </div>
+            <p class="desc" style="margin-top:16px">Done in only <strong>3 swaps</strong> at gap=1. A naive sort would
+              need ~20. Prior passes paid off.</p>
+          </div>
+          <div class="ss" id="ss7" style="display:none">
+            <div class="flow-tree">
+              <div class="flow-lbl">Original</div>
+              <div class="flow-row">
+                <div class="cell">23</div>
+                <div class="cell">29</div>
+                <div class="cell">15</div>
+                <div class="cell">3</div>
+                <div class="cell">5</div>
+                <div class="cell">44</div>
+                <div class="cell">7</div>
+                <div class="cell">36</div>
+              </div>
+              <div class="flow-arrow">&#8595; gap = 4</div>
+              <div class="flow-row">
+                <div class="cell active">5</div>
+                <div class="cell active">29</div>
+                <div class="cell active">7</div>
+                <div class="cell active">3</div>
+                <div class="cell active">23</div>
+                <div class="cell active">44</div>
+                <div class="cell active">15</div>
+                <div class="cell active">36</div>
+              </div>
+              <div class="flow-arrow">&#8595; gap = 2</div>
+              <div class="flow-row">
+                <div class="cell active">5</div>
+                <div class="cell active">3</div>
+                <div class="cell active">7</div>
+                <div class="cell active">29</div>
+                <div class="cell active">15</div>
+                <div class="cell active">36</div>
+                <div class="cell active">23</div>
+                <div class="cell active">44</div>
+              </div>
+              <div class="flow-arrow">&#8595; gap = 1</div>
+              <div class="flow-row">
+                <div class="cell sorted">3</div>
+                <div class="cell sorted">5</div>
+                <div class="cell sorted">7</div>
+                <div class="cell sorted">15</div>
+                <div class="cell sorted">23</div>
+                <div class="cell sorted">29</div>
+                <div class="cell sorted">36</div>
+                <div class="cell sorted">44</div>
+              </div>
+            </div>
+            <p class="desc" style="margin-top:8px">Complete overview: each gap pass brings elements closer to final
+              positions; gap=1 finishes in very few moves.</p>
+          </div>
+
+        </div>
+
+        <div class="step-nav">
+          <button class="step-btn" id="ss-prev" onclick="ssNav(-1)" disabled>← Prev</button>
+          <span class="step-ctr" id="ss-ctr">1 / 8</span>
+          <button class="step-btn" id="ss-next" onclick="ssNav(1)">Next →</button>
+        </div>
+      </div>
+    </div>
+
+    <!-- ═══ SLIDE 10: Shell Sort Live Animation ═══ -->
+    <div class="slide">
+      <div class="pad">
+        <div class="stag">Fast sorting algorithm</div>
+        <h2>Shell Sort — <span class="accent">Live Animation</span></h2>
+        <div class="accent-line"></div>
+        <div class="tags">
+          <span class="tag ti">Gaps: 4 → 2 → 1</span>
+          <span class="tag tg">Pseudocode synced</span>
+        </div>
+
+        <div class="anim-body">
+          <div class="anim-left">
+            <p class="anim-desc" id="anim-desc">Press ▶ to play, or drag the timeline to any point.</p>
+            <div class="bar-wrap" id="bar-wrap"></div>
+          </div>
+          <div class="anim-right">
+            <div class="ps-wrap">
+              <div class="ps-head"><span class="ps-lang">Pseudocode — Shell Sort</span></div>
+              <div class="ps-body" id="ps-body"></div>
+            </div>
+          </div>
+        </div>
+
+        <div class="ctrl-bar">
+          <button class="ctrl-btn primary" id="play-btn" onclick="togglePlay()">▶</button>
+          <button class="ctrl-btn" onclick="doReset()">↺</button>
+          <div class="speed-wrap">
+            <label>Speed</label>
+            <input type="range" class="speed-input" id="speed" min="1" max="5" value="3">
+          </div>
+          <div class="tl-wrap">
+            <input type="range" class="tl-input" id="timeline" min="0" value="0" oninput="onScrub(this.value)"
+              onmousedown="pauseForScrub()" onmouseup="afterScrub()">
+          </div>
+          <span class="step-counter" id="step-ctr">1 / –</span>
+        </div>
+      </div>
+    </div>
+
+    <!-- ═══ SLIDE 11: Shell Sort code ═══ -->
+    <div class="slide">
+      <div class="pad">
+        <div class="stag">Fast sorting algorithm</div>
+        <h2>Shell Sort — <span class="accent">Implementation</span></h2>
+        <div class="accent-line"></div>
+        <div class="two-col">
+          <div class="code-wrap pseudo">
+            <div class="code-head"><span class="code-lang">Pseudocode (Knuth gap: 1, 4, 13, 40…)</span></div>
+            <pre><span class="kw">function</span> <span class="fn">SHELL-SORT</span>(arr):
+  n = len(arr)
+  <span class="cm">// Compute largest Knuth gap ≤ n</span>
+  gap = 1
+  <span class="kw">while</span> gap &lt; n / 3:
+    gap = gap * 3 + 1  <span class="cm">// 1→4→13→40…</span>
+
+  <span class="kw">while</span> gap >= 1:
+    <span class="cm">// Insertion sort with this gap</span>
+    <span class="kw">for</span> i = gap <span class="kw">to</span> n - 1:
+      temp = arr[i]
+      j = i
+      <span class="kw">while</span> j >= gap <span class="kw">and</span> arr[j-gap] > temp:
+        arr[j] = arr[j - gap]
+        j = j - gap
+      arr[j] = temp
+    gap = gap / 3  <span class="cm">// shrink gap</span></pre>
+          </div>
+          <div class="code-wrap">
+            <div class="code-head"><span class="code-lang">Python</span></div>
+            <pre><span class="kw">def</span> <span class="fn">shell_sort</span>(arr):
+  n = len(arr)
+  gap = <span class="nm">1</span>
+  <span class="kw">while</span> gap &lt; n // <span class="nm">3</span>:
+    gap = gap * <span class="nm">3</span> + <span class="nm">1</span>
+
+  <span class="kw">while</span> gap >= <span class="nm">1</span>:
+    <span class="kw">for</span> i <span class="kw">in</span> range(gap, n):
+      temp = arr[i]
+      j = i
+      <span class="kw">while</span> j >= gap <span class="kw">and</span> arr[j-gap] > temp:
+        arr[j] = arr[j - gap]
+        j -= gap
+      arr[j] = temp
+    gap //= <span class="nm">3</span>
+  <span class="kw">return</span> arr
+
+<span class="cm"># → [3, 5, 7, 15, 23, 29, 36, 44]</span></pre>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <!-- ═══ SLIDE 12: Additional Algorithms intro ═══ -->
+    <div class="slide">
+      <div class="pad">
+        <div class="stag">Beyond comparison-based sorts</div>
+        <h2>Additional <span class="accent">Algorithms</span></h2>
+        <div class="accent-line"></div>
+        <div class="info-box" style="margin-bottom:4px">
+          <p style="font-size:20px">Comparison-based sorts cannot do better than <strong>O(n log n)</strong> in the
+            worst case. The following algorithms break this barrier under specific constraints — they exploit the
+            <em>structure</em> of the input rather than comparing values.
+          </p>
+        </div>
+        <div class="three-col" style="margin-top:22px;flex:1;align-items:stretch">
+          <div
+            style="background:#f1f5f9;border-radius:10px;padding:24px 22px;display:flex;flex-direction:column;gap:10px">
+            <h3 style="font-size:26px;margin-bottom:4px">Radix Sort</h3>
+            <p style="font-size:20px;color:#475569;line-height:1.5">Sorts integers digit by digit. Works when keys are
+              integers (or strings).</p>
+            <p style="margin-top:auto"><span class="tag ti" style="font-size:16px;padding:5px 12px">O(nk)</span></p>
+          </div>
+          <div
+            style="background:#f1f5f9;border-radius:10px;padding:24px 22px;display:flex;flex-direction:column;gap:10px">
+            <h3 style="font-size:26px;margin-bottom:4px">Heap Sort</h3>
+            <p style="font-size:20px;color:#475569;line-height:1.5">Uses a binary max-heap. Guaranteed O(n log n) with
+              O(1) space. In-place.</p>
+            <p style="margin-top:auto"><span class="tag ti" style="font-size:16px;padding:5px 12px">O(n log n)</span>
+            </p>
+          </div>
+          <div
+            style="background:#f1f5f9;border-radius:10px;padding:24px 22px;display:flex;flex-direction:column;gap:10px">
+            <h3 style="font-size:26px;margin-bottom:4px">Counting Sort</h3>
+            <p style="font-size:20px;color:#475569;line-height:1.5">Counts element occurrences. Ultra-fast when value
+              range k is small.</p>
+            <p style="margin-top:auto"><span class="tag ti" style="font-size:16px;padding:5px 12px">O(n+k)</span></p>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <!-- ═══ SLIDE 13: Radix Sort concept ═══ -->
+    <div class="slide">
+      <div class="pad">
+        <div class="stag">Specialized sorting algorithm</div>
+        <h2>Radix <span class="accent">Sort</span></h2>
+        <div class="accent-line"></div>
+        <div class="tags">
+          <span class="tag tn">Non-comparative</span><span class="tag ti">O(nk)</span><span
+            class="tag ti">Stable</span><span class="tag tn">Integer / string keys</span>
+        </div>
+        <p class="desc"><strong>How it works:</strong> Sort by digits from <em>least significant</em> to <em>most
+            significant</em> (LSD). Use a stable sort (counting sort) as the subroutine for each digit pass.</p>
+        <div id="rx-step-body" style="flex:1;display:flex;flex-direction:column;justify-content:center;min-height:0">
+          <div class="rxs" id="rx0">
+            <div class="diagram-step">
+              <div class="step-label">Original</div>
+              <div class="arr-row">
+                <div class="cell">170</div>
+                <div class="cell">45</div>
+                <div class="cell">75</div>
+                <div class="cell">90</div>
+                <div class="cell">802</div>
+                <div class="cell">24</div>
+                <div class="cell">2</div>
+                <div class="cell">66</div>
+              </div>
+            </div>
+            <p class="desc" style="margin-top:12px">8 integers with up to 3 digits. We process from the least
+              significant digit (units) to the most significant (hundreds).</p>
+          </div>
+          <div class="rxs" id="rx1" style="display:none">
+            <div class="diagram-step">
+              <div class="step-label">Pass 1 — Sort by units digit (LSD)</div>
+              <div class="arr-row">
+                <div class="cell bucket">170</div>
+                <div class="cell bucket">90</div>
+                <div class="cell bucket">802</div>
+                <div class="cell bucket">2</div>
+                <div class="cell bucket">24</div>
+                <div class="cell bucket">45</div>
+                <div class="cell bucket">75</div>
+                <div class="cell bucket">66</div><span class="arr-label">buckets: 0,0,2,4,5,5,6</span>
+              </div>
+            </div>
+            <p class="desc" style="margin-top:12px">Place each number into bucket 0-9 based on its units digit. Then
+              collect in order. Stability preserves relative order within each bucket.</p>
+          </div>
+          <div class="rxs" id="rx2" style="display:none">
+            <div class="diagram-step">
+              <div class="step-label">Pass 2 — Sort by tens digit</div>
+              <div class="arr-row">
+                <div class="cell bucket">802</div>
+                <div class="cell bucket">2</div>
+                <div class="cell bucket">24</div>
+                <div class="cell bucket">45</div>
+                <div class="cell bucket">66</div>
+                <div class="cell bucket">170</div>
+                <div class="cell bucket">75</div>
+                <div class="cell bucket">90</div>
+              </div>
+            </div>
+            <p class="desc" style="margin-top:12px">Now bucket by the tens digit. Numbers with tens digit 0 (like 802,
+              2) come first. Stability keeps the units-sort order within each bucket.</p>
+          </div>
+          <div class="rxs" id="rx3" style="display:none">
+            <div class="diagram-step">
+              <div class="step-label">Pass 3 — Sort by hundreds digit &rarr; done</div>
+              <div class="arr-row">
+                <div class="cell sorted">2</div>
+                <div class="cell sorted">24</div>
+                <div class="cell sorted">45</div>
+                <div class="cell sorted">66</div>
+                <div class="cell sorted">75</div>
+                <div class="cell sorted">90</div>
+                <div class="cell sorted">170</div>
+                <div class="cell sorted">802</div>
+              </div>
+            </div>
+            <p class="desc" style="margin-top:12px">Final pass on hundreds digit. Most numbers have hundreds digit 0, so
+              they stay in front. Array is now fully sorted!</p>
+          </div>
+          <div class="rxs" id="rx4" style="display:none">
+            <div class="flow-tree">
+              <div class="flow-lbl">Original</div>
+              <div class="flow-row">
+                <div class="cell">170</div>
+                <div class="cell">45</div>
+                <div class="cell">75</div>
+                <div class="cell">90</div>
+                <div class="cell">802</div>
+                <div class="cell">24</div>
+                <div class="cell">2</div>
+                <div class="cell">66</div>
+              </div>
+              <div class="flow-arrow">&#8595; sort by units digit</div>
+              <div class="flow-row">
+                <div class="cell active">170</div>
+                <div class="cell active">90</div>
+                <div class="cell active">802</div>
+                <div class="cell active">2</div>
+                <div class="cell active">24</div>
+                <div class="cell active">45</div>
+                <div class="cell active">75</div>
+                <div class="cell active">66</div>
+              </div>
+              <div class="flow-arrow">&#8595; sort by tens digit</div>
+              <div class="flow-row">
+                <div class="cell active">802</div>
+                <div class="cell active">2</div>
+                <div class="cell active">24</div>
+                <div class="cell active">45</div>
+                <div class="cell active">66</div>
+                <div class="cell active">170</div>
+                <div class="cell active">75</div>
+                <div class="cell active">90</div>
+              </div>
+              <div class="flow-arrow">&#8595; sort by hundreds digit</div>
+              <div class="flow-row">
+                <div class="cell sorted">2</div>
+                <div class="cell sorted">24</div>
+                <div class="cell sorted">45</div>
+                <div class="cell sorted">66</div>
+                <div class="cell sorted">75</div>
+                <div class="cell sorted">90</div>
+                <div class="cell sorted">170</div>
+                <div class="cell sorted">802</div>
+              </div>
+            </div>
+            <p class="desc" style="margin-top:8px">Complete overview: stable sort on each digit from least to most
+              significant. Each pass uses counting sort on one digit.</p>
+          </div>
+        </div>
+        <div class="step-nav">
+          <button class="step-btn" id="rx-step-prev" onclick="rxNav(-1)" disabled>&larr; Prev</button>
+          <span class="step-ctr" id="rx-step-ctr">1 / 5</span>
+          <button class="step-btn" id="rx-step-next" onclick="rxNav(1)">Next &rarr;</button>
+        </div>
+      </div>
+    </div>
+
+    <!-- ═══ SLIDE 17: Radix Sort Live Animation ═══ -->
+    <div class="slide">
+      <div class="pad">
+        <div class="stag">Specialized sorting algorithm</div>
+        <h2>Radix Sort — <span class="accent">Live Animation</span></h2>
+        <div class="accent-line"></div>
+        <div class="tags">
+          <span class="tag ti">LSD — digit by digit</span>
+          <span class="tag tg">Pseudocode synced</span>
+        </div>
+
+        <div class="anim-body">
+          <div class="anim-left">
+            <p class="anim-desc" id="rs-desc">Press ▶ to play, or drag the timeline to any point.</p>
+            <div class="bar-wrap" id="rs-bar-wrap"></div>
+          </div>
+          <div class="anim-right">
+            <div class="ps-wrap">
+              <div class="ps-head"><span class="ps-lang">Pseudocode — Radix Sort</span></div>
+              <div class="ps-body" id="rs-ps-body"></div>
+            </div>
+          </div>
+        </div>
+
+        <div class="ctrl-bar">
+          <button class="ctrl-btn primary" id="rs-play-btn" onclick="rsTogglePlay()">▶</button>
+          <button class="ctrl-btn" onclick="rsReset()">↺</button>
+          <div class="speed-wrap">
+            <label>Speed</label>
+            <input type="range" class="speed-input" id="rs-speed" min="1" max="5" value="3">
+          </div>
+          <div class="tl-wrap">
+            <input type="range" class="tl-input" id="rs-timeline" min="0" value="0" oninput="rsOnScrub(this.value)"
+              onmousedown="rsPauseScrub()" onmouseup="rsAfterScrub()">
+          </div>
+          <span class="step-counter" id="rs-step-ctr">1 / –</span>
+        </div>
+      </div>
+    </div>
+
+    <!-- ═══ SLIDE 18: Radix Sort code ═══ -->
+    <div class="slide">
+      <div class="pad">
+        <div class="stag">Specialized sorting algorithm</div>
+        <h2>Radix Sort — <span class="accent">Implementation</span></h2>
+        <div class="accent-line"></div>
+        <div class="two-col">
+          <div class="code-wrap pseudo">
+            <div class="code-head"><span class="code-lang">Pseudocode</span></div>
+            <pre><span class="kw">function</span> <span class="fn">RADIX-SORT</span>(arr):
+  maxVal = <span class="fn">MAX</span>(arr)
+  exp = 1  <span class="cm">// 1 → 10 → 100 …</span>
+  <span class="kw">while</span> maxVal / exp > 0:
+    <span class="fn">COUNTING-SORT-BY-DIGIT</span>(arr, exp)
+    exp = exp * 10
+
+<span class="kw">function</span> <span class="fn">COUNTING-SORT-BY-DIGIT</span>(arr, exp):
+  n = len(arr)
+  output = array of size n
+  count  = array of size 10, zeros
+  <span class="kw">for</span> i = 0 <span class="kw">to</span> n-1:
+    digit = (arr[i] / exp) mod 10
+    count[digit] += 1
+  <span class="kw">for</span> i = 1 <span class="kw">to</span> 9:
+    count[i] += count[i-1]
+  <span class="kw">for</span> i = n-1 <span class="kw">downto</span> 0:
+    digit = (arr[i] / exp) mod 10
+    output[count[digit]-1] = arr[i]
+    count[digit] -= 1
+  arr = output</pre>
+          </div>
+          <div class="code-wrap">
+            <div class="code-head"><span class="code-lang">Python</span></div>
+            <pre><span class="kw">def</span> <span class="fn">radix_sort</span>(arr):
+  max_val = max(arr)
+  exp = <span class="nm">1</span>
+  <span class="kw">while</span> max_val // exp > <span class="nm">0</span>:
+    <span class="fn">_counting_by_digit</span>(arr, exp)
+    exp *= <span class="nm">10</span>
+  <span class="kw">return</span> arr
+
+<span class="kw">def</span> <span class="fn">_counting_by_digit</span>(arr, exp):
+  n = len(arr)
+  output = [<span class="nm">0</span>] * n
+  count  = [<span class="nm">0</span>] * <span class="nm">10</span>
+  <span class="kw">for</span> val <span class="kw">in</span> arr:
+    count[(val // exp) % <span class="nm">10</span>] += <span class="nm">1</span>
+  <span class="kw">for</span> i <span class="kw">in</span> range(<span class="nm">1</span>, <span class="nm">10</span>):
+    count[i] += count[i-<span class="nm">1</span>]
+  <span class="kw">for</span> i <span class="kw">in</span> range(n-<span class="nm">1</span>, -<span class="nm">1</span>, -<span class="nm">1</span>):
+    d = (arr[i] // exp) % <span class="nm">10</span>
+    output[count[d]-<span class="nm">1</span>] = arr[i]
+    count[d] -= <span class="nm">1</span>
+  arr[:] = output
+
+<span class="cm"># → [2, 24, 45, 66, 75, 90, 170, 802]</span></pre>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <!-- ═══ SLIDE 15: Heap Sort concept ═══ -->
+    <div class="slide">
+      <div class="pad">
+        <div class="stag">Specialized sorting algorithm</div>
+        <h2>Heap <span class="accent">Sort</span></h2>
+        <div class="accent-line"></div>
+        <div class="tags">
+          <span class="tag ti">In-place</span><span class="tag ti">O(n log n) always</span><span class="tag tn">Not
+            stable</span><span class="tag tg">O(1) space</span>
+        </div>
+        <p class="desc"><strong>How it works:</strong> Build a <em>max-heap</em> from the array (largest element at
+          root). Repeatedly swap the root (max) with the last unsorted element, then restore the heap property
+          (heapify).</p>
+        <div id="hp-step-body" style="flex:1;display:flex;flex-direction:column;justify-content:center;min-height:0">
+          <div class="hps" id="hp0">
+            <div class="diagram-step">
+              <div class="step-label">Step 1 — Build max-heap</div>
+              <div class="arr-row">
+                <div class="cell pivot">90</div>
+                <div class="cell active">80</div>
+                <div class="cell active">45</div>
+                <div class="cell active">30</div>
+                <div class="cell active">20</div>
+                <div class="cell active">10</div>
+                <div class="cell active">15</div><span class="arr-label">root=90</span>
+              </div>
+            </div>
+            <p class="desc" style="margin-top:12px">Starting from the last non-leaf node, heapify upwards. Result: a
+              max-heap where every parent &ge; its children. Root holds the maximum (90).</p>
+          </div>
+          <div class="hps" id="hp1" style="display:none">
+            <div class="diagram-step">
+              <div class="step-label">Step 2 — Swap root (90) with last, shrink heap</div>
+              <div class="arr-row">
+                <div class="cell pivot">80</div>
+                <div class="cell active">30</div>
+                <div class="cell active">45</div>
+                <div class="cell active">15</div>
+                <div class="cell active">20</div>
+                <div class="cell active">10</div>
+                <div class="cell sorted">90</div>
+              </div>
+            </div>
+            <p class="desc" style="margin-top:12px">Swap root (90) with the last element, then exclude it from the heap.
+              Heapify the new root down — 80 becomes the new max.</p>
+          </div>
+          <div class="hps" id="hp2" style="display:none">
+            <div class="diagram-step">
+              <div class="step-label">Step 3 — Repeat: swap 80 to end, heapify</div>
+              <div class="arr-row">
+                <div class="cell pivot">45</div>
+                <div class="cell active">30</div>
+                <div class="cell active">10</div>
+                <div class="cell active">15</div>
+                <div class="cell active">20</div>
+                <div class="cell sorted">80</div>
+                <div class="cell sorted">90</div>
+              </div>
+            </div>
+            <p class="desc" style="margin-top:12px">Same process: swap root 80 to position 5, shrink heap, heapify. 45
+              is the new root. Sorted portion grows from the right.</p>
+          </div>
+          <div class="hps" id="hp3" style="display:none">
+            <div class="diagram-step">
+              <div class="step-label">Step 4 — All extracted &rarr; sorted</div>
+              <div class="arr-row">
+                <div class="cell sorted">10</div>
+                <div class="cell sorted">15</div>
+                <div class="cell sorted">20</div>
+                <div class="cell sorted">30</div>
+                <div class="cell sorted">45</div>
+                <div class="cell sorted">80</div>
+                <div class="cell sorted">90</div>
+              </div>
+            </div>
+            <p class="desc" style="margin-top:12px">After extracting all elements, the array is fully sorted in
+              ascending order. O(n log n) guaranteed!</p>
+          </div>
+          <div class="hps" id="hp4" style="display:none">
+            <div class="flow-tree">
+              <div class="flow-lbl">Input</div>
+              <div class="flow-row">
+                <div class="cell">30</div>
+                <div class="cell">80</div>
+                <div class="cell">45</div>
+                <div class="cell">20</div>
+                <div class="cell">10</div>
+                <div class="cell">15</div>
+                <div class="cell">90</div>
+              </div>
+              <div class="flow-arrow">&#8595; build max-heap</div>
+              <div class="flow-row">
+                <div class="cell pivot">90</div>
+                <div class="cell active">80</div>
+                <div class="cell active">45</div>
+                <div class="cell active">30</div>
+                <div class="cell active">20</div>
+                <div class="cell active">10</div>
+                <div class="cell active">15</div>
+              </div>
+              <div class="flow-arrow">&#8595; extract 90</div>
+              <div class="flow-row">
+                <div class="cell pivot">80</div>
+                <div class="cell active">30</div>
+                <div class="cell active">45</div>
+                <div class="cell active">15</div>
+                <div class="cell active">20</div>
+                <div class="cell active">10</div>
+                <div class="flow-sep">|</div>
+                <div class="cell sorted">90</div>
+              </div>
+              <div class="flow-arrow">&#8595; extract 80</div>
+              <div class="flow-row">
+                <div class="cell pivot">45</div>
+                <div class="cell active">30</div>
+                <div class="cell active">10</div>
+                <div class="cell active">15</div>
+                <div class="cell active">20</div>
+                <div class="flow-sep">|</div>
+                <div class="cell sorted">80</div>
+                <div class="cell sorted">90</div>
+              </div>
+              <div class="flow-arrow">&#8595; extract all remaining</div>
+              <div class="flow-row">
+                <div class="cell sorted">10</div>
+                <div class="cell sorted">15</div>
+                <div class="cell sorted">20</div>
+                <div class="cell sorted">30</div>
+                <div class="cell sorted">45</div>
+                <div class="cell sorted">80</div>
+                <div class="cell sorted">90</div>
+              </div>
+            </div>
+            <p class="desc" style="margin-top:8px">Complete overview: build a max-heap, then repeatedly extract the root
+              to build the sorted array from right to left.</p>
+          </div>
+        </div>
+        <div class="step-nav">
+          <button class="step-btn" id="hp-step-prev" onclick="hpNav(-1)" disabled>&larr; Prev</button>
+          <span class="step-ctr" id="hp-step-ctr">1 / 5</span>
+          <button class="step-btn" id="hp-step-next" onclick="hpNav(1)">Next &rarr;</button>
+        </div>
+      </div>
+    </div>
+
+    <!-- ═══ SLIDE 20: Heap Sort Live Animation ═══ -->
+    <div class="slide">
+      <div class="pad">
+        <div class="stag">Specialized sorting algorithm</div>
+        <h2>Heap Sort — <span class="accent">Live Animation</span></h2>
+        <div class="accent-line"></div>
+        <div class="tags">
+          <span class="tag ti">Build max-heap → extract</span>
+          <span class="tag tg">Pseudocode synced</span>
+        </div>
+
+        <div class="anim-body">
+          <div class="anim-left">
+            <p class="anim-desc" id="hs-desc">Press ▶ to play, or drag the timeline to any point.</p>
+            <div class="bar-wrap" id="hs-bar-wrap"></div>
+          </div>
+          <div class="anim-right">
+            <div class="ps-wrap">
+              <div class="ps-head"><span class="ps-lang">Pseudocode — Heap Sort</span></div>
+              <div class="ps-body" id="hs-ps-body"></div>
+            </div>
+          </div>
+        </div>
+
+        <div class="ctrl-bar">
+          <button class="ctrl-btn primary" id="hs-play-btn" onclick="hsTogglePlay()">▶</button>
+          <button class="ctrl-btn" onclick="hsReset()">↺</button>
+          <div class="speed-wrap">
+            <label>Speed</label>
+            <input type="range" class="speed-input" id="hs-speed" min="1" max="5" value="3">
+          </div>
+          <div class="tl-wrap">
+            <input type="range" class="tl-input" id="hs-timeline" min="0" value="0" oninput="hsOnScrub(this.value)"
+              onmousedown="hsPauseScrub()" onmouseup="hsAfterScrub()">
+          </div>
+          <span class="step-counter" id="hs-step-ctr">1 / –</span>
+        </div>
+      </div>
+    </div>
+
+    <!-- ═══ SLIDE 21: Heap Sort code ═══ -->
+    <div class="slide">
+      <div class="pad">
+        <div class="stag">Specialized sorting algorithm</div>
+        <h2>Heap Sort — <span class="accent">Implementation</span></h2>
+        <div class="accent-line"></div>
+        <div class="two-col">
+          <div class="code-wrap pseudo">
+            <div class="code-head"><span class="code-lang">Pseudocode</span></div>
+            <pre><span class="kw">function</span> <span class="fn">HEAP-SORT</span>(arr):
+  n = len(arr)
+  <span class="cm">// Build max-heap</span>
+  <span class="kw">for</span> i = n/2 - 1 <span class="kw">downto</span> 0:
+    <span class="fn">HEAPIFY</span>(arr, n, i)
+  <span class="cm">// Extract elements one by one</span>
+  <span class="kw">for</span> i = n-1 <span class="kw">downto</span> 1:
+    <span class="fn">SWAP</span>(arr[0], arr[i])
+    <span class="fn">HEAPIFY</span>(arr, i, 0)
+
+<span class="kw">function</span> <span class="fn">HEAPIFY</span>(arr, n, i):
+  largest = i
+  left  = 2*i + 1
+  right = 2*i + 2
+  <span class="kw">if</span> left &lt; n <span class="kw">and</span> arr[left] > arr[largest]:
+    largest = left
+  <span class="kw">if</span> right &lt; n <span class="kw">and</span> arr[right] > arr[largest]:
+    largest = right
+  <span class="kw">if</span> largest != i:
+    <span class="fn">SWAP</span>(arr[i], arr[largest])
+    <span class="fn">HEAPIFY</span>(arr, n, largest)</pre>
+          </div>
+          <div class="code-wrap">
+            <div class="code-head"><span class="code-lang">Python</span></div>
+            <pre><span class="kw">def</span> <span class="fn">heap_sort</span>(arr):
+  n = len(arr)
+  <span class="kw">for</span> i <span class="kw">in</span> range(n // <span class="nm">2</span> - <span class="nm">1</span>, -<span class="nm">1</span>, -<span class="nm">1</span>):
+    <span class="fn">heapify</span>(arr, n, i)
+  <span class="kw">for</span> i <span class="kw">in</span> range(n - <span class="nm">1</span>, <span class="nm">0</span>, -<span class="nm">1</span>):
+    arr[<span class="nm">0</span>], arr[i] = arr[i], arr[<span class="nm">0</span>]
+    <span class="fn">heapify</span>(arr, i, <span class="nm">0</span>)
+  <span class="kw">return</span> arr
+
+<span class="kw">def</span> <span class="fn">heapify</span>(arr, n, i):
+  largest = i
+  l, r = <span class="nm">2</span>*i+<span class="nm">1</span>, <span class="nm">2</span>*i+<span class="nm">2</span>
+  <span class="kw">if</span> l &lt; n <span class="kw">and</span> arr[l] > arr[largest]:
+    largest = l
+  <span class="kw">if</span> r &lt; n <span class="kw">and</span> arr[r] > arr[largest]:
+    largest = r
+  <span class="kw">if</span> largest != i:
+    arr[i], arr[largest] = arr[largest], arr[i]
+    <span class="fn">heapify</span>(arr, n, largest)
+
+<span class="cm"># → [10, 15, 20, 30, 45, 80, 90]</span></pre>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <!-- ═══ SLIDE 17: Counting Sort concept ═══ -->
+    <div class="slide">
+      <div class="pad">
+        <div class="stag">Specialized sorting algorithm</div>
+        <h2>Counting <span class="accent">Sort</span></h2>
+        <div class="accent-line"></div>
+        <div class="tags">
+          <span class="tag ti">O(n+k)</span><span class="tag ti">Stable</span><span
+            class="tag tn">Non-comparative</span><span class="tag tn">Integer keys only</span>
+        </div>
+        <p class="desc"><strong>How it works:</strong> Count how many times each value appears. Compute cumulative
+          counts (each entry holds the position of the last occurrence). Walk the input backwards to place each element
+          stably.</p>
+        <div id="cn-step-body" style="flex:1;display:flex;flex-direction:column;justify-content:center;min-height:0">
+          <div class="cns" id="cn0">
+            <div class="diagram-step">
+              <div class="step-label">Input array (values 0&ndash;8)</div>
+              <div class="arr-row">
+                <div class="cell">4</div>
+                <div class="cell">2</div>
+                <div class="cell">2</div>
+                <div class="cell">8</div>
+                <div class="cell">3</div>
+                <div class="cell">3</div>
+                <div class="cell">1</div>
+              </div>
+            </div>
+            <p class="desc" style="margin-top:12px">7 integers with values in range 0-8. We will count occurrences of
+              each value, then use those counts to place elements directly.</p>
+          </div>
+          <div class="cns" id="cn1" style="display:none">
+            <div class="diagram-step">
+              <div class="step-label">Count array (index = value, value = count)</div>
+              <div class="arr-row">
+                <div class="cell bucket">0</div>
+                <div class="cell bucket">1</div>
+                <div class="cell bucket">2</div>
+                <div class="cell bucket">2</div>
+                <div class="cell bucket">1</div>
+                <div class="cell bucket">0</div>
+                <div class="cell bucket">0</div>
+                <div class="cell bucket">0</div>
+                <div class="cell bucket">1</div><span class="arr-label">idx: 0 1 2 3 4 5 6 7 8</span>
+              </div>
+            </div>
+            <p class="desc" style="margin-top:12px">Scan the input and tally: value 1 appears once, value 2 twice, value
+              3 twice, value 4 once, value 8 once.</p>
+          </div>
+          <div class="cns" id="cn2" style="display:none">
+            <div class="diagram-step">
+              <div class="step-label">Cumulative count</div>
+              <div class="arr-row">
+                <div class="cell active">0</div>
+                <div class="cell active">1</div>
+                <div class="cell active">3</div>
+                <div class="cell active">5</div>
+                <div class="cell active">6</div>
+                <div class="cell active">6</div>
+                <div class="cell active">6</div>
+                <div class="cell active">6</div>
+                <div class="cell active">7</div>
+              </div>
+            </div>
+            <p class="desc" style="margin-top:12px">Each entry now tells us: "how many elements are &le; this index?"
+              This gives the ending position for each value in the output.</p>
+          </div>
+          <div class="cns" id="cn3" style="display:none">
+            <div class="diagram-step">
+              <div class="step-label">Output &mdash; place each element using cumulative count</div>
+              <div class="arr-row">
+                <div class="cell sorted">1</div>
+                <div class="cell sorted">2</div>
+                <div class="cell sorted">2</div>
+                <div class="cell sorted">3</div>
+                <div class="cell sorted">3</div>
+                <div class="cell sorted">4</div>
+                <div class="cell sorted">8</div>
+              </div>
+            </div>
+            <p class="desc" style="margin-top:12px">Walk input backwards: for each value, decrement its count and place
+              it at that index. Walking backwards preserves stability. Done!</p>
+          </div>
+          <div class="cns" id="cn4" style="display:none">
+            <div class="flow-tree">
+              <div class="flow-lbl">Input</div>
+              <div class="flow-row">
+                <div class="cell">4</div>
+                <div class="cell">2</div>
+                <div class="cell">2</div>
+                <div class="cell">8</div>
+                <div class="cell">3</div>
+                <div class="cell">3</div>
+                <div class="cell">1</div>
+              </div>
+              <div class="flow-arrow">&#8595; count occurrences</div>
+              <div class="flow-lbl" style="font-size:9px">idx: 0&ensp;1&ensp;2&ensp;3&ensp;4&ensp;5&ensp;6&ensp;7&ensp;8
+              </div>
+              <div class="flow-row">
+                <div class="cell bucket">0</div>
+                <div class="cell bucket">1</div>
+                <div class="cell bucket">2</div>
+                <div class="cell bucket">2</div>
+                <div class="cell bucket">1</div>
+                <div class="cell bucket">0</div>
+                <div class="cell bucket">0</div>
+                <div class="cell bucket">0</div>
+                <div class="cell bucket">1</div>
+              </div>
+              <div class="flow-arrow">&#8595; cumulative sum</div>
+              <div class="flow-row">
+                <div class="cell active">0</div>
+                <div class="cell active">1</div>
+                <div class="cell active">3</div>
+                <div class="cell active">5</div>
+                <div class="cell active">6</div>
+                <div class="cell active">6</div>
+                <div class="cell active">6</div>
+                <div class="cell active">6</div>
+                <div class="cell active">7</div>
+              </div>
+              <div class="flow-arrow">&#8595; place elements</div>
+              <div class="flow-row">
+                <div class="cell sorted">1</div>
+                <div class="cell sorted">2</div>
+                <div class="cell sorted">2</div>
+                <div class="cell sorted">3</div>
+                <div class="cell sorted">3</div>
+                <div class="cell sorted">4</div>
+                <div class="cell sorted">8</div>
+              </div>
+            </div>
+            <p class="desc" style="margin-top:8px">Complete overview: count values, build cumulative sums for positions,
+              then place each element at its correct index.</p>
+          </div>
+        </div>
+        <div class="step-nav">
+          <button class="step-btn" id="cn-step-prev" onclick="cnNav(-1)" disabled>&larr; Prev</button>
+          <span class="step-ctr" id="cn-step-ctr">1 / 5</span>
+          <button class="step-btn" id="cn-step-next" onclick="cnNav(1)">Next &rarr;</button>
+        </div>
+      </div>
+    </div>
+
+    <!-- ═══ SLIDE 23: Counting Sort Live Animation ═══ -->
+    <div class="slide">
+      <div class="pad">
+        <div class="stag">Specialized sorting algorithm</div>
+        <h2>Counting Sort — <span class="accent">Live Animation</span></h2>
+        <div class="accent-line"></div>
+        <div class="tags">
+          <span class="tag ti">Count → cumulative → place</span>
+          <span class="tag tg">Pseudocode synced</span>
+        </div>
+
+        <div class="anim-body">
+          <div class="anim-left">
+            <p class="anim-desc" id="cs-desc">Press ▶ to play, or drag the timeline to any point.</p>
+            <div class="bar-wrap" id="cs-bar-wrap"></div>
+          </div>
+          <div class="anim-right">
+            <div class="ps-wrap">
+              <div class="ps-head"><span class="ps-lang">Pseudocode — Counting Sort</span></div>
+              <div class="ps-body" id="cs-ps-body"></div>
+            </div>
+          </div>
+        </div>
+
+        <div class="ctrl-bar">
+          <button class="ctrl-btn primary" id="cs-play-btn" onclick="csTogglePlay()">▶</button>
+          <button class="ctrl-btn" onclick="csReset()">↺</button>
+          <div class="speed-wrap">
+            <label>Speed</label>
+            <input type="range" class="speed-input" id="cs-speed" min="1" max="5" value="3">
+          </div>
+          <div class="tl-wrap">
+            <input type="range" class="tl-input" id="cs-timeline" min="0" value="0" oninput="csOnScrub(this.value)"
+              onmousedown="csPauseScrub()" onmouseup="csAfterScrub()">
+          </div>
+          <span class="step-counter" id="cs-step-ctr">1 / –</span>
+        </div>
+      </div>
+    </div>
+
+    <!-- ═══ SLIDE 24: Counting Sort code ═══ -->
+    <div class="slide">
+      <div class="pad">
+        <div class="stag">Specialized sorting algorithm</div>
+        <h2>Counting Sort — <span class="accent">Implementation</span></h2>
+        <div class="accent-line"></div>
+        <div class="two-col">
+          <div class="code-wrap pseudo">
+            <div class="code-head"><span class="code-lang">Pseudocode</span></div>
+            <pre><span class="kw">function</span> <span class="fn">COUNTING-SORT</span>(arr):
+  k = <span class="fn">MAX</span>(arr)
+  count  = array of size k+1, zeros
+  output = array of size len(arr)
+
+  <span class="cm">// Count occurrences</span>
+  <span class="kw">for</span> val <span class="kw">in</span> arr:
+    count[val] += 1
+
+  <span class="cm">// Cumulative count</span>
+  <span class="kw">for</span> i = 1 <span class="kw">to</span> k:
+    count[i] += count[i-1]
+
+  <span class="cm">// Build output (backwards for stability)</span>
+  <span class="kw">for</span> i = len(arr)-1 <span class="kw">downto</span> 0:
+    val = arr[i]
+    output[count[val]-1] = val
+    count[val] -= 1
+
+  <span class="kw">return</span> output</pre>
+          </div>
+          <div class="code-wrap">
+            <div class="code-head"><span class="code-lang">Python</span></div>
+            <pre><span class="kw">def</span> <span class="fn">counting_sort</span>(arr):
+  <span class="kw">if not</span> arr:
+    <span class="kw">return</span> arr
+  k = max(arr)
+  count  = [<span class="nm">0</span>] * (k + <span class="nm">1</span>)
+  output = [<span class="nm">0</span>] * len(arr)
+
+  <span class="kw">for</span> val <span class="kw">in</span> arr:
+    count[val] += <span class="nm">1</span>
+
+  <span class="kw">for</span> i <span class="kw">in</span> range(<span class="nm">1</span>, k + <span class="nm">1</span>):
+    count[i] += count[i - <span class="nm">1</span>]
+
+  <span class="kw">for</span> i <span class="kw">in</span> range(len(arr) - <span class="nm">1</span>, -<span class="nm">1</span>, -<span class="nm">1</span>):
+    val = arr[i]
+    output[count[val] - <span class="nm">1</span>] = val
+    count[val] -= <span class="nm">1</span>
+
+  <span class="kw">return</span> output
+
+<span class="cm"># → [1, 2, 2, 3, 3, 4, 8]</span></pre>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <!-- ═══ SLIDE 19: Complexity Table ═══ -->
+    <div class="slide">
+      <div class="pad">
+        <div class="stag">Summary</div>
+        <h2>Sorting Algorithms — <span class="accent">Complexity</span></h2>
+        <div class="accent-line"></div>
+        <table class="complexity-table">
+          <thead>
+            <tr>
+              <th>Algorithm</th>
+              <th>Time — Best</th>
+              <th>Time — Average</th>
+              <th>Time — Worst</th>
+              <th>Space</th>
+            </tr>
+          </thead>
+          <tbody>
+            <tr>
+              <td><strong>Merge Sort</strong></td>
+              <td class="best">O(n log n)</td>
+              <td class="ok">O(n log n)</td>
+              <td class="ok">O(n log n)</td>
+              <td class="weak">O(n)</td>
+            </tr>
+            <tr>
+              <td><strong>Quick Sort</strong></td>
+              <td class="best">O(n log n)</td>
+              <td class="ok">O(n log n)</td>
+              <td class="weak">O(n²)</td>
+              <td class="best">O(log n)</td>
+            </tr>
+            <tr>
+              <td><strong>Shell Sort</strong></td>
+              <td class="best">O(n log n)</td>
+              <td class="ok">O(n log² n)</td>
+              <td class="weak">O(n²)</td>
+              <td class="best">O(1)</td>
+            </tr>
+            <tr>
+              <td><strong>Radix Sort</strong></td>
+              <td class="best">O(nk)</td>
+              <td class="ok">O(nk)</td>
+              <td class="ok">O(nk)</td>
+              <td class="weak">O(n+k)</td>
+            </tr>
+            <tr>
+              <td><strong>Heap Sort</strong></td>
+              <td class="best">O(n log n)</td>
+              <td class="ok">O(n log n)</td>
+              <td class="ok">O(n log n)</td>
+              <td class="best">O(1)</td>
+            </tr>
+            <tr>
+              <td><strong>Counting Sort</strong></td>
+              <td class="best">O(n+k)</td>
+              <td class="best">O(n+k)</td>
+              <td class="best">O(n+k)</td>
+              <td class="weak">O(n+k)</td>
+            </tr>
+          </tbody>
+        </table>
+        <p style="margin-top:18px;font-size:13px;color:#94a3b8">
+          <span style="color:#15803d;font-weight:700">Green</span> = best-in-class &nbsp;·&nbsp;
+          <span style="color:#b45309;font-weight:700">Orange</span> = notable weakness &nbsp;·&nbsp;
+          <span style="color:#1d4ed8;font-weight:700">Blue</span> = standard &nbsp;·&nbsp;
+          k = range of values / digit count
+        </p>
+      </div>
+    </div>
+
+    <!-- ═══ SLIDE 20: Resources ═══ -->
+    <div class="slide">
+      <div class="pad">
+        <div class="stag">Further reading</div>
+        <h2>Resources &amp; <span class="accent">Links</span></h2>
+        <div class="accent-line"></div>
+        <div style="display:grid;grid-template-columns:1fr 1fr;gap:10px 28px;margin-top:8px;flex:1;align-content:start">
+          <a href="https://www.reddit.com/r/Damnthatsinteresting/comments/1beqfeq/how_fastest_sorting_algorithms_compare/"
+            target="_blank"
+            style="display:flex;align-items:flex-start;gap:10px;text-decoration:none;padding:10px 14px;border-radius:8px;border:1px solid #e2e8f0;background:#f8fafc;transition:border-color .15s"
+            onmouseover="this.style.borderColor='#017a93'" onmouseout="this.style.borderColor='#e2e8f0'">
+            <span style="font-size:18px;flex-shrink:0">🔗</span>
+            <div>
+              <div style="font-size:13px;font-weight:600;color:#1e293b">Fastest Sorting Algorithms Compared</div>
+              <div style="font-size:12px;color:#64748b;margin-top:2px">reddit.com — r/Damnthatsinteresting</div>
+            </div>
+          </a>
+          <a href="https://en.wikipedia.org/wiki/Divide-and-conquer_algorithm" target="_blank"
+            style="display:flex;align-items:flex-start;gap:10px;text-decoration:none;padding:10px 14px;border-radius:8px;border:1px solid #e2e8f0;background:#f8fafc;transition:border-color .15s"
+            onmouseover="this.style.borderColor='#017a93'" onmouseout="this.style.borderColor='#e2e8f0'">
+            <span style="font-size:18px;flex-shrink:0">🔗</span>
+            <div>
+              <div style="font-size:13px;font-weight:600;color:#1e293b">Divide-and-Conquer Algorithm</div>
+              <div style="font-size:12px;color:#64748b;margin-top:2px">Wikipedia</div>
+            </div>
+          </a>
+          <a href="https://lamfo-unb.github.io/2019/04/21/Sorting-algorithms/" target="_blank"
+            style="display:flex;align-items:flex-start;gap:10px;text-decoration:none;padding:10px 14px;border-radius:8px;border:1px solid #e2e8f0;background:#f8fafc;transition:border-color .15s"
+            onmouseover="this.style.borderColor='#017a93'" onmouseout="this.style.borderColor='#e2e8f0'">
+            <span style="font-size:18px;flex-shrink:0">🔗</span>
+            <div>
+              <div style="font-size:13px;font-weight:600;color:#1e293b">Sorting Algorithms — LAMFO</div>
+              <div style="font-size:12px;color:#64748b;margin-top:2px">lamfo-unb.github.io</div>
+            </div>
+          </a>
+          <a href="https://en.wikipedia.org/wiki/Sorting_algorithm" target="_blank"
+            style="display:flex;align-items:flex-start;gap:10px;text-decoration:none;padding:10px 14px;border-radius:8px;border:1px solid #e2e8f0;background:#f8fafc;transition:border-color .15s"
+            onmouseover="this.style.borderColor='#017a93'" onmouseout="this.style.borderColor='#e2e8f0'">
+            <span style="font-size:18px;flex-shrink:0">🔗</span>
+            <div>
+              <div style="font-size:13px;font-weight:600;color:#1e293b">Sorting Algorithm</div>
+              <div style="font-size:12px;color:#64748b;margin-top:2px">Wikipedia</div>
+            </div>
+          </a>
+          <a href="https://www.toptal.com/developers/sorting-algorithms" target="_blank"
+            style="display:flex;align-items:flex-start;gap:10px;text-decoration:none;padding:10px 14px;border-radius:8px;border:1px solid #e2e8f0;background:#f8fafc;transition:border-color .15s"
+            onmouseover="this.style.borderColor='#017a93'" onmouseout="this.style.borderColor='#e2e8f0'">
+            <span style="font-size:18px;flex-shrink:0">🔗</span>
+            <div>
+              <div style="font-size:13px;font-weight:600;color:#1e293b">Sorting Algorithms Visualised</div>
+              <div style="font-size:12px;color:#64748b;margin-top:2px">toptal.com</div>
+            </div>
+          </a>
+          <a href="https://medium.com/better-programming/5-basic-sorting-algorithms-you-must-know-9ef5b1f3949c"
+            target="_blank"
+            style="display:flex;align-items:flex-start;gap:10px;text-decoration:none;padding:10px 14px;border-radius:8px;border:1px solid #e2e8f0;background:#f8fafc;transition:border-color .15s"
+            onmouseover="this.style.borderColor='#017a93'" onmouseout="this.style.borderColor='#e2e8f0'">
+            <span style="font-size:18px;flex-shrink:0">🔗</span>
+            <div>
+              <div style="font-size:13px;font-weight:600;color:#1e293b">5 Basic Sorting Algorithms You Must Know</div>
+              <div style="font-size:12px;color:#64748b;margin-top:2px">medium.com — Better Programming</div>
+            </div>
+          </a>
+          <a href="https://www.cs.usfca.edu/~galles/visualization/ComparisonSort.html" target="_blank"
+            style="display:flex;align-items:flex-start;gap:10px;text-decoration:none;padding:10px 14px;border-radius:8px;border:1px solid #e2e8f0;background:#f8fafc;transition:border-color .15s"
+            onmouseover="this.style.borderColor='#017a93'" onmouseout="this.style.borderColor='#e2e8f0'">
+            <span style="font-size:18px;flex-shrink:0">🔗</span>
+            <div>
+              <div style="font-size:13px;font-weight:600;color:#1e293b">Comparison Sort Visualisation</div>
+              <div style="font-size:12px;color:#64748b;margin-top:2px">cs.usfca.edu — David Galles</div>
+            </div>
+          </a>
+          <a href="https://www.csfieldguide.org.nz/en/interactives/sorting-algorithms/" target="_blank"
+            style="display:flex;align-items:flex-start;gap:10px;text-decoration:none;padding:10px 14px;border-radius:8px;border:1px solid #e2e8f0;background:#f8fafc;transition:border-color .15s"
+            onmouseover="this.style.borderColor='#017a93'" onmouseout="this.style.borderColor='#e2e8f0'">
+            <span style="font-size:18px;flex-shrink:0">🔗</span>
+            <div>
+              <div style="font-size:13px;font-weight:600;color:#1e293b">Sorting Algorithms Interactive</div>
+              <div style="font-size:12px;color:#64748b;margin-top:2px">csfieldguide.org.nz</div>
+            </div>
+          </a>
+          <a href="https://www.csfieldguide.org.nz/en/chapters/algorithms/sorting/" target="_blank"
+            style="display:flex;align-items:flex-start;gap:10px;text-decoration:none;padding:10px 14px;border-radius:8px;border:1px solid #e2e8f0;background:#f8fafc;transition:border-color .15s"
+            onmouseover="this.style.borderColor='#017a93'" onmouseout="this.style.borderColor='#e2e8f0'">
+            <span style="font-size:18px;flex-shrink:0">🔗</span>
+            <div>
+              <div style="font-size:13px;font-weight:600;color:#1e293b">Sorting — CS Field Guide</div>
+              <div style="font-size:12px;color:#64748b;margin-top:2px">csfieldguide.org.nz</div>
+            </div>
+          </a>
+          <a href="https://medium.com/marktech/comparison-sort-algorithms-for-dummies-e621cbff2c3f" target="_blank"
+            style="display:flex;align-items:flex-start;gap:10px;text-decoration:none;padding:10px 14px;border-radius:8px;border:1px solid #e2e8f0;background:#f8fafc;transition:border-color .15s"
+            onmouseover="this.style.borderColor='#017a93'" onmouseout="this.style.borderColor='#e2e8f0'">
+            <span style="font-size:18px;flex-shrink:0">🔗</span>
+            <div>
+              <div style="font-size:13px;font-weight:600;color:#1e293b">Comparison Sort Algorithms for Dummies</div>
+              <div style="font-size:12px;color:#64748b;margin-top:2px">medium.com — MarkTech</div>
+            </div>
+          </a>
+        </div>
+      </div>
+    </div>
+
+    <!-- ═══ SLIDE 27: Questions ═══ -->
+    <div class="slide">
+      <div class="pad" style="justify-content:center;align-items:center;text-align:center">
+        <div
+          style="font-size:clamp(100px,18vw,220px);font-weight:700;color:#017a93;line-height:1;font-family:'Ubuntu',sans-serif">
+          ?</div>
+        <h2 style="font-size:clamp(32px,5vw,56px);margin-top:12px">Any <span class="accent">Questions</span>?</h2>
+        <div class="accent-line" style="margin:20px auto"></div>
+        <p style="font-size:18px;color:#94a3b8;margin-top:8px">Thank you for your attention!</p>
+      </div>
+    </div>
+
+  </div><!-- /deck -->
+  <div class="nav-pill">
+    <button class="nav-btn" id="prev-btn" onclick="navigate(-1)" disabled>←</button>
+    <span class="nav-counter" id="counter">1 / 28</span>
+    <button class="nav-btn" id="next-btn" onclick="navigate(1)">→</button>
+  </div>
+  <script>
+    const TOTAL = 28;
+    const slides = document.querySelectorAll('.slide');
+    let cur = 0;
+    function navigate(dir) {
+      const leaving = cur;
+      slides[leaving].classList.remove('active');
+      slides[leaving].classList.add('prev');
+      setTimeout(() => slides[leaving].classList.remove('prev'), 400);
+      cur = Math.max(0, Math.min(slides.length - 1, cur + dir));
+      slides[cur].classList.add('active');
+      document.getElementById('prev-btn').disabled = cur === 0;
+      document.getElementById('next-btn').disabled = cur === slides.length - 1;
+      document.getElementById('counter').textContent = (cur + 1) + ' / ' + TOTAL;
+      document.getElementById('progress').style.width = ((cur + 1) / TOTAL * 100) + '%';
+      // Reset step pagination when entering a paginated slide
+      resetSteps(leaving);
+      if (dir === -1) showLastStep(cur);
+    }
+    // Helpers for resetting / jumping to last step on paginated slides
+    function resetSteps(slideIdx) {
+      const map = { 6: 'ms', 9: 'qs', 12: 'ss', 16: 'rx', 19: 'hp', 22: 'cn' };
+      const p = map[slideIdx]; if (!p) return;
+      _goToStep(p, 0);
+    }
+    function showLastStep(slideIdx) {
+      const map = { 6: 'ms', 9: 'qs', 12: 'ss', 16: 'rx', 19: 'hp', 22: 'cn' };
+      const p = map[slideIdx]; if (!p) return;
+      const items = document.querySelectorAll('.' + _stepClass(p));
+      _goToStep(p, items.length - 1);
+    }
+    function _stepClass(p) { return { ms: 'ms', qs: 'qss', ss: 'ss', rx: 'rxs', hp: 'hps', cn: 'cns' }[p]; }
+    function _goToStep(p, target) {
+      const cls = _stepClass(p);
+      const items = document.querySelectorAll('.' + cls);
+      items.forEach(el => el.style.display = 'none');
+      items[target].style.display = 'block';
+      // Update index variables
+      if (p === 'ms') msIdx = target;
+      else if (p === 'qs') qssIdx = target;
+      else if (p === 'ss') ssIdx = target;
+      else if (p === 'rx') rxIdx = target;
+      else if (p === 'hp') hpIdx = target;
+      else if (p === 'cn') cnIdx = target;
+      // Update buttons & counter — use correct ID patterns per sort
+      const ctrId = { ms: 'ms-nav-ctr', qs: 'qs-nav-ctr', ss: 'ss-ctr', rx: 'rx-step-ctr', hp: 'hp-step-ctr', cn: 'cn-step-ctr' }[p];
+      const prevId = { ms: 'ms-step-prev', qs: 'qs-step-prev', ss: 'ss-prev', rx: 'rx-step-prev', hp: 'hp-step-prev', cn: 'cn-step-prev' }[p];
+      const nextId = { ms: 'ms-step-next', qs: 'qs-step-next', ss: 'ss-next', rx: 'rx-step-next', hp: 'hp-step-next', cn: 'cn-step-next' }[p];
+      document.getElementById(prevId).disabled = target === 0;
+      document.getElementById(nextId).disabled = target === items.length - 1;
+      document.getElementById(ctrId).textContent = (target + 1) + ' / ' + items.length;
+    }
+    document.addEventListener('keydown', e => {
+      // Map paginated slide indices to their nav function, index var, and items
+      const stepSlides = {
+        6: { nav: () => msNav, idx: () => msIdx, items: () => msItems },
+        9: { nav: () => qsStepNav, idx: () => qssIdx, items: () => qssItems },
+        12: { nav: () => ssNav, idx: () => ssIdx, items: () => ssItems },
+        16: { nav: () => rxNav, idx: () => rxIdx, items: () => rxItems },
+        19: { nav: () => hpNav, idx: () => hpIdx, items: () => hpItems },
+        22: { nav: () => cnNav, idx: () => cnIdx, items: () => cnItems }
+      };
+      const s = stepSlides[cur];
+      if (e.key === 'ArrowRight') {
+        if (s) { const i = s.idx(), len = s.items().length; if (i < len - 1) { s.nav()(1); } else { navigate(1); } }
+        else { navigate(1); }
+      }
+      if (e.key === 'ArrowLeft') {
+        if (s) { const i = s.idx(); if (i > 0) { s.nav()(-1); } else { navigate(-1); } }
+        else { navigate(-1); }
+      }
+    });
+    document.getElementById('progress').style.width = ((1 / TOTAL) * 100) + '%';
+
+    // ── Shell Sort step pagination ──────────────────────────────────────
+    const ssItems = document.querySelectorAll('.ss');
+    let ssIdx = 0;
+    function ssNav(dir) {
+      ssItems[ssIdx].style.display = 'none';
+      ssIdx = Math.max(0, Math.min(ssItems.length - 1, ssIdx + dir));
+      ssItems[ssIdx].style.display = 'block';
+      document.getElementById('ss-prev').disabled = ssIdx === 0;
+      document.getElementById('ss-next').disabled = ssIdx === ssItems.length - 1;
+      document.getElementById('ss-ctr').textContent = (ssIdx + 1) + ' / ' + ssItems.length;
+    }
+
+    // ── Merge Sort step pagination ─────────────────────────────────────
+    const msItems = document.querySelectorAll('.ms');
+    let msIdx = 0;
+    function msNav(dir) {
+      msItems[msIdx].style.display = 'none';
+      msIdx = Math.max(0, Math.min(msItems.length - 1, msIdx + dir));
+      msItems[msIdx].style.display = 'block';
+      document.getElementById('ms-step-prev').disabled = msIdx === 0;
+      document.getElementById('ms-step-next').disabled = msIdx === msItems.length - 1;
+      document.getElementById('ms-nav-ctr').textContent = (msIdx + 1) + ' / ' + msItems.length;
+    }
+
+    // ── Quick Sort step pagination ─────────────────────────────────────
+    const qssItems = document.querySelectorAll('.qss');
+    let qssIdx = 0;
+    function qsStepNav(dir) {
+      qssItems[qssIdx].style.display = 'none';
+      qssIdx = Math.max(0, Math.min(qssItems.length - 1, qssIdx + dir));
+      qssItems[qssIdx].style.display = 'block';
+      document.getElementById('qs-step-prev').disabled = qssIdx === 0;
+      document.getElementById('qs-step-next').disabled = qssIdx === qssItems.length - 1;
+      document.getElementById('qs-nav-ctr').textContent = (qssIdx + 1) + ' / ' + qssItems.length;
+    }
+
+    // ── Radix Sort step pagination ─────────────────────────────────────
+    const rxItems = document.querySelectorAll('.rxs');
+    let rxIdx = 0;
+    function rxNav(dir) {
+      rxItems[rxIdx].style.display = 'none';
+      rxIdx = Math.max(0, Math.min(rxItems.length - 1, rxIdx + dir));
+      rxItems[rxIdx].style.display = 'block';
+      document.getElementById('rx-step-prev').disabled = rxIdx === 0;
+      document.getElementById('rx-step-next').disabled = rxIdx === rxItems.length - 1;
+      document.getElementById('rx-step-ctr').textContent = (rxIdx + 1) + ' / ' + rxItems.length;
+    }
+
+    // ── Heap Sort step pagination ──────────────────────────────────────
+    const hpItems = document.querySelectorAll('.hps');
+    let hpIdx = 0;
+    function hpNav(dir) {
+      hpItems[hpIdx].style.display = 'none';
+      hpIdx = Math.max(0, Math.min(hpItems.length - 1, hpIdx + dir));
+      hpItems[hpIdx].style.display = 'block';
+      document.getElementById('hp-step-prev').disabled = hpIdx === 0;
+      document.getElementById('hp-step-next').disabled = hpIdx === hpItems.length - 1;
+      document.getElementById('hp-step-ctr').textContent = (hpIdx + 1) + ' / ' + hpItems.length;
+    }
+
+    // ── Counting Sort step pagination ──────────────────────────────────
+    const cnItems = document.querySelectorAll('.cns');
+    let cnIdx = 0;
+    function cnNav(dir) {
+      cnItems[cnIdx].style.display = 'none';
+      cnIdx = Math.max(0, Math.min(cnItems.length - 1, cnIdx + dir));
+      cnItems[cnIdx].style.display = 'block';
+      document.getElementById('cn-step-prev').disabled = cnIdx === 0;
+      document.getElementById('cn-step-next').disabled = cnIdx === cnItems.length - 1;
+      document.getElementById('cn-step-ctr').textContent = (cnIdx + 1) + ' / ' + cnItems.length;
+    }
+
+    // ── Generic animation engine factory ───────────────────────────────
+    function makeAnim(cfg) {
+      // cfg: { prefix, psLines, origArr, maxVal, computeSteps }
+      const { prefix, psLines, origArr, maxVal, computeStepsFn } = cfg;
+      const MAX_H = 280;
+
+      // Build pseudocode panel
+      const psBody = document.getElementById(prefix + '-ps-body');
+      if (psBody) {
+        psLines.forEach((l, i) => {
+          const d = document.createElement('div');
+          d.className = 'ps-line'; d.id = prefix + 'pl' + i;
+          d.innerHTML = l || '&nbsp;';
+          psBody.appendChild(d);
+        });
+      }
+
+      const steps = computeStepsFn(origArr);
+      let idx = 0, playing = false, scrubbing = false, timer = null, curLine = -1;
+
+      const tlEl = document.getElementById(prefix + '-timeline');
+      if (tlEl) tlEl.max = steps.length - 1;
+
+      function setLine(n) {
+        if (curLine >= 0) document.getElementById(prefix + 'pl' + curLine)?.classList.remove('hl');
+        curLine = n;
+        if (n >= 0) { const el = document.getElementById(prefix + 'pl' + n); if (el) { el.classList.add('hl'); el.scrollIntoView({ block: 'nearest', behavior: 'smooth' }); } }
+      }
+
+      function renderBars(s, animated) {
+        const w = document.getElementById(prefix + '-bar-wrap');
+        if (!w) return;
+        w.innerHTML = '';
+        s.arr.forEach((v, i) => {
+          const col = document.createElement('div'); col.className = 'bar-col';
+          const bar = document.createElement('div'); bar.className = 'bar';
+          if (!animated) bar.style.transition = 'none';
+          bar.style.height = Math.round(v / maxVal * MAX_H) + 'px';
+          bar.style.background = s.done ? '#22c55e' : s.hi[0] === i ? '#f43f5e' : s.hi.includes(i) && s.hi[1] === i ? '#f97316' : '#017a93';
+          bar.style.opacity = (!s.done && s.hi.length > 0 && !s.hi.includes(i)) ? '0.3' : '1';
+          const bv = document.createElement('div'); bv.className = 'bval'; bv.textContent = v;
+          const bi = document.createElement('div'); bi.className = 'bidx'; bi.textContent = i;
+          col.append(bar, bv, bi); w.appendChild(col);
+        });
+      }
+
+      function showStep(i, animated) {
+        if (i < 0 || i >= steps.length) return;
+        idx = i;
+        const s = steps[i];
+        renderBars(s, animated !== false);
+        setLine(s.line);
+        const descEl = document.getElementById(prefix + '-desc');
+        if (descEl) descEl.textContent = s.desc;
+        const pct = i / (steps.length - 1) * 100;
+        const tl = document.getElementById(prefix + '-timeline');
+        if (tl) { tl.value = i; tl.style.background = `linear-gradient(to right,#017a93 ${pct}%,#e2e8f0 ${pct}%)`; }
+        const ctr = document.getElementById(prefix + '-step-ctr');
+        if (ctr) ctr.textContent = `${i + 1} / ${steps.length}`;
+      }
+
+      function getMs() { return [900, 480, 230, 110, 45][(+document.getElementById(prefix + '-speed').value) - 1]; }
+      function setIcon(p) { const b = document.getElementById(prefix + '-play-btn'); if (b) b.textContent = p ? '⏸' : '▶'; }
+      function schedule() {
+        if (!playing) return;
+        if (timer) clearTimeout(timer);
+        timer = setTimeout(() => {
+          if (!playing || scrubbing) return;
+          if (idx >= steps.length - 1) { playing = false; setIcon(false); return; }
+          showStep(idx + 1, true); schedule();
+        }, getMs());
+      }
+
+      showStep(0, false);
+
+      // expose controls used by onclick attributes
+      window[prefix + 'TogglePlay'] = function () {
+        if (playing) { playing = false; clearTimeout(timer); setIcon(false); }
+        else { if (idx >= steps.length - 1) idx = 0; playing = true; setIcon(true); schedule(); }
+      };
+      window[prefix + 'Reset'] = function () {
+        playing = false; clearTimeout(timer); setIcon(false); showStep(0, false);
+      };
+      window[prefix + 'PauseScrub'] = function () { scrubbing = true; if (playing) clearTimeout(timer); };
+      window[prefix + 'OnScrub'] = function (v) { showStep(+v, false); };
+      window[prefix + 'AfterScrub'] = function () { scrubbing = false; if (playing) schedule(); };
+    }
+
+    // ── Shell Sort Animation (standalone — keeps original IDs) ──────────
+    const SS_ORIG = [23, 29, 15, 3, 5, 44, 7, 36];
+    const SS_MAX = 44, MAX_H_SS = 280;
+    const PS_LINES = [
+      'function <span class="ps-fn">SHELL-SORT</span>(arr):',
+      '  n = len(arr)',
+      '  gap = n // 2      <span class="ps-cm">← n/2, n/4 … 1</span>',
+      '',
+      '  <span class="ps-kw">while</span> gap &gt;= 1:',
+      '    <span class="ps-kw">for</span> i = gap <span class="ps-kw">to</span> n-1:',
+      '      temp = arr[i]',
+      '      j = i',
+      '      <span class="ps-kw">while</span> j &gt;= gap <span class="ps-kw">and</span>',
+      '        arr[j-gap] &gt; temp:',
+      '        arr[j] = arr[j-gap]',
+      '        j = j - gap',
+      '      arr[j] = temp',
+      '    gap = gap // 2',
+    ];
+    const psBody = document.getElementById('ps-body');
+    if (psBody) { PS_LINES.forEach((l, i) => { const d = document.createElement('div'); d.className = 'ps-line'; d.id = 'pl' + i; d.innerHTML = l || '&nbsp;'; psBody.appendChild(d); }); }
+    function computeSteps() {
+      const steps = []; const arr = [...SS_ORIG]; const n = arr.length;
+      function push(hi, line, desc, done) { steps.push({ arr: [...arr], hi: hi || [], line: line ?? -1, desc, done: !!done }); }
+      let gap = Math.floor(n / 2);
+      push([], 2, `Initialise: gap = ${n} // 2 = ${gap}`);
+      while (gap >= 1) {
+        push([], 4, `Outer loop — gap = ${gap}`);
+        for (let i = gap; i < n; i++) {
+          const temp = arr[i]; push([i], 5, `i = ${i}: picking up arr[${i}] = ${temp}`); push([i], 6, `temp = ${temp}`);
+          let j = i; push([j], 7, `j = ${i}`);
+          while (j >= gap) {
+            push([j - gap, j], 8, `Compare arr[${j - gap}] = ${arr[j - gap]}  vs  temp = ${temp}`);
+            if (arr[j - gap] > temp) { arr[j] = arr[j - gap]; push([j, j - gap], 10, `Shift right: arr[${j}] ← ${arr[j]}`); j -= gap; push([j], 11, `j = ${j}`); }
+            else { push([j - gap, j], 8, `${arr[j - gap]} ≤ ${temp} → stop`); break; }
+          }
+          arr[j] = temp; push([j], 12, `Place: arr[${j}] = ${temp} ✓`);
+        }
+        const next = Math.floor(gap / 2); push([], 13, `Shrink gap: ${gap} // 2 = ${next}`); gap = next;
+      }
+      push([], -1, `✓ Sorted! [${arr.join(', ')}]`, true); return steps;
+    }
+    const animSteps = computeSteps();
+    let stepIdx = 0, animPlaying = false, animScrubbing = false, animTimer = null, curLine = -1;
+    function setLine(n) { if (curLine >= 0) document.getElementById('pl' + curLine)?.classList.remove('hl'); curLine = n; if (n >= 0) { const el = document.getElementById('pl' + n); if (el) { el.classList.add('hl'); el.scrollIntoView({ block: 'nearest', behavior: 'smooth' }); } } }
+    function renderBars(s, animated) { const w = document.getElementById('bar-wrap'); if (!w) return; w.innerHTML = ''; s.arr.forEach((v, i) => { const col = document.createElement('div'); col.className = 'bar-col'; const bar = document.createElement('div'); bar.className = 'bar'; if (!animated) bar.style.transition = 'none'; bar.style.height = Math.round(v / SS_MAX * MAX_H_SS) + 'px'; bar.style.background = s.done ? '#22c55e' : s.hi[0] === i ? '#f43f5e' : s.hi[1] === i ? '#f97316' : '#017a93'; bar.style.opacity = (!s.done && s.hi.length > 0 && !s.hi.includes(i)) ? '0.3' : '1'; const bv = document.createElement('div'); bv.className = 'bval'; bv.textContent = v; const bi = document.createElement('div'); bi.className = 'bidx'; bi.textContent = i; col.append(bar, bv, bi); w.appendChild(col); }); }
+    function showStep(idx, animated) { if (idx < 0 || idx >= animSteps.length) return; stepIdx = idx; const s = animSteps[idx]; renderBars(s, animated !== false); setLine(s.line); const descEl = document.getElementById('anim-desc'); if (descEl) descEl.textContent = s.desc; const pct = idx / (animSteps.length - 1) * 100; const tl = document.getElementById('timeline'); if (tl) { tl.value = idx; tl.style.background = `linear-gradient(to right,#017a93 ${pct}%,#e2e8f0 ${pct}%)`; } const ctr = document.getElementById('step-ctr'); if (ctr) ctr.textContent = `${idx + 1} / ${animSteps.length}`; }
+    function getMs() { return [900, 480, 230, 110, 45][(+document.getElementById('speed').value) - 1]; }
+    function setPlayIcon(p) { const b = document.getElementById('play-btn'); if (b) b.textContent = p ? '⏸' : '▶'; }
+    function scheduleNext() { if (!animPlaying) return; if (animTimer) clearTimeout(animTimer); animTimer = setTimeout(() => { if (!animPlaying || animScrubbing) return; if (stepIdx >= animSteps.length - 1) { animPlaying = false; setPlayIcon(false); return; } showStep(stepIdx + 1, true); scheduleNext(); }, getMs()); }
+    function togglePlay() { if (animPlaying) { animPlaying = false; clearTimeout(animTimer); setPlayIcon(false); } else { if (stepIdx >= animSteps.length - 1) stepIdx = 0; animPlaying = true; setPlayIcon(true); scheduleNext(); } }
+    function doReset() { animPlaying = false; clearTimeout(animTimer); setPlayIcon(false); showStep(0, false); }
+    function pauseForScrub() { animScrubbing = true; if (animPlaying) clearTimeout(animTimer); }
+    function onScrub(v) { showStep(+v, false); }
+    function afterScrub() { animScrubbing = false; if (animPlaying) scheduleNext(); }
+    const tlEl = document.getElementById('timeline'); if (tlEl) tlEl.max = animSteps.length - 1;
+    showStep(0, false);
+
+    // ── Merge Sort Animation ────────────────────────────────────────────
+    makeAnim({
+      prefix: 'ms',
+      maxVal: 82,
+      origArr: [38, 27, 43, 3, 9, 82, 50, 15],
+      psLines: [
+        '<span class="ps-kw">function</span> <span class="ps-fn">MERGE-SORT</span>(arr, lo, hi):',
+        '  <span class="ps-kw">if</span> lo &gt;= hi: <span class="ps-kw">return</span>',
+        '  mid = (lo + hi) // 2',
+        '  <span class="ps-fn">MERGE-SORT</span>(arr, lo, mid)',
+        '  <span class="ps-fn">MERGE-SORT</span>(arr, mid+1, hi)',
+        '  <span class="ps-fn">MERGE</span>(arr, lo, mid, hi)',
+        '',
+        '<span class="ps-kw">function</span> <span class="ps-fn">MERGE</span>(arr, lo, mid, hi):',
+        '  left = arr[lo..mid]',
+        '  right = arr[mid+1..hi]',
+        '  i = 0; j = 0; k = lo',
+        '  <span class="ps-kw">while</span> i &lt; len(left) <span class="ps-kw">and</span> j &lt; len(right):',
+        '    <span class="ps-kw">if</span> left[i] &lt;= right[j]:',
+        '      arr[k] = left[i]; i++',
+        '    <span class="ps-kw">else</span>:',
+        '      arr[k] = right[j]; j++',
+        '    k++',
+        '  <span class="ps-cm">// copy remaining</span>',
+      ],
+      computeStepsFn(origArr) {
+        const steps = [];
+        const arr = [...origArr];
+        const n = arr.length;
+        function push(hi, line, desc, done) { steps.push({ arr: [...arr], hi: hi || [], line: line ?? -1, desc, done: !!done }); }
+        function mergeSort(lo, hi) {
+          push([lo, hi], 0, `mergeSort(${lo}, ${hi})`);
+          if (lo >= hi) { push([lo], 1, `Base case: single element ${arr[lo]}`); return; }
+          const mid = Math.floor((lo + hi) / 2);
+          push([lo, mid, hi], 2, `mid = ${mid}`);
+          mergeSort(lo, mid);
+          mergeSort(mid + 1, hi);
+          // merge
+          const left = arr.slice(lo, mid + 1);
+          const right = arr.slice(mid + 1, hi + 1);
+          push([lo, hi], 7, `Merge [${lo}..${mid}] and [${mid + 1}..${hi}]`);
+          let i = 0, j = 0, k = lo;
+          push([k], 10, `i=0 j=0 k=${k}`);
+          while (i < left.length && j < right.length) {
+            push([lo + i, mid + 1 + j], 11, `Compare left[${i}]=${left[i]} vs right[${j}]=${right[j]}`);
+            if (left[i] <= right[j]) { arr[k] = left[i]; push([k], 13, `Place ${left[i]} → arr[${k}]`); i++; }
+            else { arr[k] = right[j]; push([k], 15, `Place ${right[j]} → arr[${k}]`); j++; }
+            k++;
+          }
+          while (i < left.length) { arr[k] = left[i]; push([k], 17, `Copy remaining left: ${left[i]} → arr[${k}]`); i++; k++; }
+          while (j < right.length) { arr[k] = right[j]; push([k], 17, `Copy remaining right: ${right[j]} → arr[${k}]`); j++; k++; }
+        }
+        push([], 0, `Start: [${arr.join(', ')}]`);
+        mergeSort(0, n - 1);
+        push([], -1, `✓ Sorted! [${arr.join(', ')}]`, true);
+        return steps;
+      }
+    });
+
+    // ── Quick Sort Animation ────────────────────────────────────────────
+    makeAnim({
+      prefix: 'qs',
+      maxVal: 90,
+      origArr: [10, 80, 30, 90, 40, 50, 70, 60],
+      psLines: [
+        '<span class="ps-kw">function</span> <span class="ps-fn">QUICKSORT</span>(arr, lo, hi):',
+        '  <span class="ps-kw">if</span> lo &lt; hi:',
+        '    pi = <span class="ps-fn">PARTITION</span>(arr, lo, hi)',
+        '    <span class="ps-fn">QUICKSORT</span>(arr, lo, pi-1)',
+        '    <span class="ps-fn">QUICKSORT</span>(arr, pi+1, hi)',
+        '',
+        '<span class="ps-kw">function</span> <span class="ps-fn">PARTITION</span>(arr, lo, hi):',
+        '  pivot = arr[hi]',
+        '  i = lo - 1',
+        '  <span class="ps-kw">for</span> j = lo <span class="ps-kw">to</span> hi-1:',
+        '    <span class="ps-kw">if</span> arr[j] &lt;= pivot:',
+        '      i++',
+        '      <span class="ps-fn">SWAP</span>(arr[i], arr[j])',
+        '  <span class="ps-fn">SWAP</span>(arr[i+1], arr[hi])',
+        '  <span class="ps-kw">return</span> i+1',
+      ],
+      computeStepsFn(origArr) {
+        const steps = [];
+        const arr = [...origArr];
+        function push(hi, line, desc, done) { steps.push({ arr: [...arr], hi: hi || [], line: line ?? -1, desc, done: !!done }); }
+        function swap(a, b) { const t = arr[a]; arr[a] = arr[b]; arr[b] = t; }
+        function partition(lo, hi) {
+          const pivot = arr[hi];
+          push([hi], 7, `pivot = arr[${hi}] = ${pivot}`);
+          let i = lo - 1;
+          push([], 8, `i = ${i}`);
+          for (let j = lo; j < hi; j++) {
+            push([j, hi], 9, `j=${j}: arr[${j}]=${arr[j]} vs pivot=${pivot}`);
+            if (arr[j] <= pivot) {
+              i++;
+              push([i, j], 11, `arr[${j}]=${arr[j]} ≤ pivot → i=${i}, swap arr[${i}] ↔ arr[${j}]`);
+              swap(i, j);
+              push([i, j], 12, `Swapped: arr[${i}]=${arr[i]}, arr[${j}]=${arr[j]}`);
+            }
+          }
+          swap(i + 1, hi);
+          push([i + 1], 13, `Place pivot: SWAP arr[${i + 1}] ↔ arr[${hi}] → pivot ${pivot} at index ${i + 1}`);
+          return i + 1;
+        }
+        function quickSort(lo, hi) {
+          push([lo, hi], 0, `quickSort(${lo}, ${hi})`);
+          if (lo < hi) {
+            const pi = partition(lo, hi);
+            push([pi], 2, `Pivot placed at index ${pi}`);
+            quickSort(lo, pi - 1);
+            quickSort(pi + 1, hi);
+          }
+        }
+        push([], 0, `Start: [${arr.join(', ')}]`);
+        quickSort(0, arr.length - 1);
+        push([], -1, `✓ Sorted! [${arr.join(', ')}]`, true);
+        return steps;
+      }
+    });
+
+    // ── Radix Sort Animation ────────────────────────────────────────────
+    makeAnim({
+      prefix: 'rs',
+      maxVal: 802,
+      origArr: [170, 45, 75, 90, 802, 24, 2, 66],
+      psLines: [
+        '<span class="ps-kw">function</span> <span class="ps-fn">RADIX-SORT</span>(arr):',
+        '  maxVal = <span class="ps-fn">MAX</span>(arr)',
+        '  exp = 1  <span class="ps-cm">// 1 → 10 → 100 …</span>',
+        '  <span class="ps-kw">while</span> maxVal // exp &gt; 0:',
+        '    <span class="ps-fn">COUNT-BY-DIGIT</span>(arr, exp)',
+        '    exp = exp * 10',
+        '',
+        '<span class="ps-kw">function</span> <span class="ps-fn">COUNT-BY-DIGIT</span>(arr, exp):',
+        '  count[0..9] = 0',
+        '  <span class="ps-kw">for</span> val <span class="ps-kw">in</span> arr:',
+        '    digit = (val // exp) % 10',
+        '    count[digit]++',
+        '  <span class="ps-cm">// cumulative counts</span>',
+        '  <span class="ps-kw">for</span> i = 1 <span class="ps-kw">to</span> 9: count[i] += count[i-1]',
+        '  <span class="ps-cm">// place elements (backwards)</span>',
+        '  <span class="ps-kw">for</span> i = n-1 <span class="ps-kw">downto</span> 0:',
+        '    output[count[digit]-1] = arr[i]',
+      ],
+      computeStepsFn(origArr) {
+        const steps = [];
+        const arr = [...origArr];
+        const n = arr.length;
+        function push(hi, line, desc, done) { steps.push({ arr: [...arr], hi: hi || [], line: line ?? -1, desc, done: !!done }); }
+        push([], 0, `Start: [${arr.join(', ')}]`);
+        const maxVal = Math.max(...arr);
+        push([], 1, `maxVal = ${maxVal}`);
+        let exp = 1;
+        while (Math.floor(maxVal / exp) > 0) {
+          push([], 3, `exp = ${exp} (${exp === 1 ? 'units' : exp === 10 ? 'tens' : 'hundreds'} digit)`);
+          // count
+          const count = new Array(10).fill(0);
+          push([], 8, `Reset count[0..9] = 0`);
+          for (let i = 0; i < n; i++) {
+            const d = Math.floor(arr[i] / exp) % 10;
+            count[d]++;
+            push([i], 10, `arr[${i}]=${arr[i]} → digit=${d} → count[${d}]=${count[d]}`);
+          }
+          // cumulative
+          push([], 12, `Compute cumulative counts`);
+          for (let i = 1; i < 10; i++)count[i] += count[i - 1];
+          // place
+          const output = new Array(n);
+          push([], 14, `Place elements backwards for stability`);
+          for (let i = n - 1; i >= 0; i--) {
+            const d = Math.floor(arr[i] / exp) % 10;
+            output[count[d] - 1] = arr[i];
+            count[d]--;
+            push([i], 16, `arr[${i}]=${arr[i]} digit=${d} → output[${count[d]}]`);
+          }
+          for (let i = 0; i < n; i++)arr[i] = output[i];
+          push([], 4, `After exp=${exp}: [${arr.join(', ')}]`);
+          exp *= 10;
+        }
+        push([], -1, `✓ Sorted! [${arr.join(', ')}]`, true);
+        return steps;
+      }
+    });
+
+    // ── Heap Sort Animation ─────────────────────────────────────────────
+    makeAnim({
+      prefix: 'hs',
+      maxVal: 90,
+      origArr: [20, 45, 10, 30, 90, 15, 80, 50],
+      psLines: [
+        '<span class="ps-kw">function</span> <span class="ps-fn">HEAP-SORT</span>(arr):',
+        '  n = len(arr)',
+        '  <span class="ps-cm">// Build max-heap</span>',
+        '  <span class="ps-kw">for</span> i = n//2-1 <span class="ps-kw">downto</span> 0:',
+        '    <span class="ps-fn">HEAPIFY</span>(arr, n, i)',
+        '  <span class="ps-cm">// Extract elements</span>',
+        '  <span class="ps-kw">for</span> i = n-1 <span class="ps-kw">downto</span> 1:',
+        '    <span class="ps-fn">SWAP</span>(arr[0], arr[i])',
+        '    <span class="ps-fn">HEAPIFY</span>(arr, i, 0)',
+        '',
+        '<span class="ps-kw">function</span> <span class="ps-fn">HEAPIFY</span>(arr, n, i):',
+        '  largest = i',
+        '  l = 2*i+1; r = 2*i+2',
+        '  <span class="ps-kw">if</span> l &lt; n <span class="ps-kw">and</span> arr[l] &gt; arr[largest]: largest=l',
+        '  <span class="ps-kw">if</span> r &lt; n <span class="ps-kw">and</span> arr[r] &gt; arr[largest]: largest=r',
+        '  <span class="ps-kw">if</span> largest != i:',
+        '    <span class="ps-fn">SWAP</span>(arr[i], arr[largest])',
+        '    <span class="ps-fn">HEAPIFY</span>(arr, n, largest)',
+      ],
+      computeStepsFn(origArr) {
+        const steps = [];
+        const arr = [...origArr];
+        const n = arr.length;
+        function push(hi, line, desc, done) { steps.push({ arr: [...arr], hi: hi || [], line: line ?? -1, desc, done: !!done }); }
+        function swap(a, b) { const t = arr[a]; arr[a] = arr[b]; arr[b] = t; }
+        function heapify(size, i) {
+          push([i], 11, `heapify(size=${size}, i=${i}): largest=${i}`);
+          let largest = i;
+          const l = 2 * i + 1, r = 2 * i + 2;
+          push([i, l, r], 12, `l=${l}, r=${r}`);
+          if (l < size && arr[l] > arr[largest]) { largest = l; push([largest, l], 13, `arr[${l}]=${arr[l]} > arr[${i}]=${arr[i]} → largest=${l}`); }
+          if (r < size && arr[r] > arr[largest]) { largest = r; push([largest, r], 14, `arr[${r}]=${arr[r]} > arr[${largest > i ? i : l}] → largest=${r}`); }
+          if (largest !== i) {
+            push([i, largest], 16, `Swap arr[${i}]=${arr[i]} ↔ arr[${largest}]=${arr[largest]}`);
+            swap(i, largest);
+            push([i, largest], 17, `Recurse heapify at ${largest}`);
+            heapify(size, largest);
+          }
+        }
+        push([], 0, `Start: [${arr.join(', ')}]`);
+        push([], 3, `Build max-heap phase`);
+        for (let i = Math.floor(n / 2) - 1; i >= 0; i--) {
+          push([i], 4, `heapify from index ${i}`);
+          heapify(n, i);
+        }
+        push([], 5, `Extraction phase`);
+        for (let i = n - 1; i > 0; i--) {
+          push([0, i], 7, `Swap root arr[0]=${arr[0]} with arr[${i}]=${arr[i]}`);
+          swap(0, i);
+          push([0], 8, `Heapify remaining heap size ${i}`);
+          heapify(i, 0);
+        }
+        push([], -1, `✓ Sorted! [${arr.join(', ')}]`, true);
+        return steps;
+      }
+    });
+
+    // ── Counting Sort Animation ─────────────────────────────────────────
+    makeAnim({
+      prefix: 'cs',
+      maxVal: 8,
+      origArr: [4, 2, 2, 8, 3, 3, 1, 5],
+      psLines: [
+        '<span class="ps-kw">function</span> <span class="ps-fn">COUNTING-SORT</span>(arr):',
+        '  k = <span class="ps-fn">MAX</span>(arr)',
+        '  count[0..k] = 0',
+        '  <span class="ps-cm">// Count occurrences</span>',
+        '  <span class="ps-kw">for</span> val <span class="ps-kw">in</span> arr:',
+        '    count[val]++',
+        '  <span class="ps-cm">// Cumulative count</span>',
+        '  <span class="ps-kw">for</span> i = 1 <span class="ps-kw">to</span> k:',
+        '    count[i] += count[i-1]',
+        '  <span class="ps-cm">// Build output (backwards)</span>',
+        '  <span class="ps-kw">for</span> i = n-1 <span class="ps-kw">downto</span> 0:',
+        '    val = arr[i]',
+        '    output[count[val]-1] = val',
+        '    count[val]--',
+        '  <span class="ps-kw">return</span> output',
+      ],
+      computeStepsFn(origArr) {
+        const steps = [];
+        const arr = [...origArr];
+        const n = arr.length;
+        function push(hi, line, desc, done) { steps.push({ arr: [...arr], hi: hi || [], line: line ?? -1, desc, done: !!done }); }
+        push([], 0, `Start: [${arr.join(', ')}]`);
+        const k = Math.max(...arr);
+        push([], 1, `k = max(arr) = ${k}`);
+        const count = new Array(k + 1).fill(0);
+        push([], 2, `count[0..${k}] = 0`);
+        push([], 3, `Count occurrences`);
+        for (let i = 0; i < n; i++) {
+          count[arr[i]]++;
+          push([i], 5, `arr[${i}]=${arr[i]} → count[${arr[i]}]=${count[arr[i]]}`);
+        }
+        push([], 6, `Compute cumulative counts: count[i] += count[i-1]`);
+        for (let i = 1; i <= k; i++) {
+          count[i] += count[i - 1];
+          push([], 8, `count[${i}] = ${count[i]}`);
+        }
+        const output = new Array(n);
+        push([], 9, `Build output (backwards for stability)`);
+        for (let i = n - 1; i >= 0; i--) {
+          const val = arr[i];
+          output[count[val] - 1] = val;
+          count[val]--;
+          push([i], 12, `arr[${i}]=${val} → output[${count[val]}] = ${val}`);
+        }
+        for (let i = 0; i < n; i++)arr[i] = output[i];
+        push([], -1, `✓ Sorted! [${arr.join(', ')}]`, true);
+        return steps;
+      }
+    });
+  </script>
+</body>
+
+</html>
