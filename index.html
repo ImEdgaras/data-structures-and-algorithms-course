@@ -1,0 +1,468 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Data Structures & Algorithms — Course Index</title>
+  <link href="https://fonts.googleapis.com/css2?family=Ubuntu:wght@400;500;700&family=Open+Sans:wght@400;600&family=JetBrains+Mono:wght@400;500;700&display=swap" rel="stylesheet">
+  <style>
+    *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0 }
+
+    :root {
+      --teal:    #017a93;
+      --teal-dk: #015f72;
+      --slate:   #1e293b;
+      --mid:     #475569;
+      --muted:   #94a3b8;
+      --border:  #e2e8f0;
+      --bg:      #f8fafc;
+      --white:   #ffffff;
+    }
+
+    body {
+      font-family: 'Open Sans', sans-serif;
+      background: var(--bg);
+      color: var(--slate);
+      min-height: 100vh;
+    }
+
+    /* ── Header ── */
+    header {
+      background: var(--white);
+      border-bottom: 1px solid var(--border);
+      padding: 40px 64px 36px;
+    }
+
+    .header-logos {
+      display: flex;
+      align-items: center;
+      gap: 14px;
+      margin-bottom: 28px;
+    }
+
+    .header-logos img {
+      height: 20px;
+      object-fit: contain;
+      opacity: 0.8;
+    }
+
+    .stag {
+      font-family: 'JetBrains Mono', monospace;
+      font-size: 11px;
+      letter-spacing: .15em;
+      text-transform: uppercase;
+      color: var(--teal);
+      margin-bottom: 10px;
+    }
+
+    header h1 {
+      font-family: 'Ubuntu', sans-serif;
+      font-size: clamp(32px, 5vw, 56px);
+      font-weight: 700;
+      color: var(--slate);
+      line-height: 1.1;
+    }
+
+    header h1 .accent { color: var(--teal) }
+
+    .accent-line {
+      width: 56px;
+      height: 4px;
+      background: var(--teal);
+      border-radius: 2px;
+      margin: 20px 0;
+    }
+
+    .header-meta {
+      font-size: 15px;
+      color: var(--muted);
+    }
+
+    .header-meta strong { color: var(--mid); }
+
+    /* ── Main layout ── */
+    main {
+      max-width: 1160px;
+      margin: 0 auto;
+      padding: 48px 64px 80px;
+    }
+
+    /* ── Part label ── */
+    .part-label {
+      font-family: 'JetBrains Mono', monospace;
+      font-size: 11px;
+      letter-spacing: .15em;
+      text-transform: uppercase;
+      color: var(--muted);
+      margin-bottom: 18px;
+      margin-top: 40px;
+      display: flex;
+      align-items: center;
+      gap: 12px;
+    }
+
+    .part-label:first-of-type { margin-top: 0; }
+
+    .part-label::after {
+      content: '';
+      flex: 1;
+      height: 1px;
+      background: var(--border);
+    }
+
+    /* ── Lecture grid ── */
+    .lecture-grid {
+      display: grid;
+      grid-template-columns: repeat(auto-fill, minmax(320px, 1fr));
+      gap: 14px;
+      margin-bottom: 8px;
+    }
+
+    .lecture-card {
+      background: var(--white);
+      border: 1px solid var(--border);
+      border-radius: 12px;
+      padding: 22px 24px 20px;
+      text-decoration: none;
+      color: inherit;
+      display: flex;
+      flex-direction: column;
+      gap: 8px;
+      transition: border-color .2s, box-shadow .2s, transform .15s;
+      position: relative;
+      overflow: hidden;
+    }
+
+    .lecture-card::before {
+      content: '';
+      position: absolute;
+      left: 0; top: 0; bottom: 0;
+      width: 3px;
+      background: var(--border);
+      transition: background .2s;
+      border-radius: 12px 0 0 12px;
+    }
+
+    .lecture-card:not(.unavailable):hover {
+      border-color: var(--teal);
+      box-shadow: 0 4px 20px rgba(1, 122, 147, .1);
+      transform: translateY(-2px);
+    }
+
+    .lecture-card:not(.unavailable):hover::before {
+      background: var(--teal);
+    }
+
+    .lecture-card.current {
+      border-color: var(--teal);
+      background: #f0fbfd;
+    }
+
+    .lecture-card.current::before {
+      background: var(--teal);
+    }
+
+    .lecture-card.unavailable {
+      opacity: .5;
+      pointer-events: none;
+      cursor: default;
+    }
+
+    .card-num {
+      font-family: 'JetBrains Mono', monospace;
+      font-size: 10px;
+      color: var(--muted);
+      letter-spacing: .08em;
+      text-transform: uppercase;
+    }
+
+    .card-title {
+      font-family: 'Ubuntu', sans-serif;
+      font-weight: 700;
+      font-size: 16px;
+      color: var(--slate);
+      line-height: 1.25;
+    }
+
+    .card-subtitle {
+      font-size: 12.5px;
+      color: var(--mid);
+      line-height: 1.55;
+    }
+
+    .card-tags {
+      display: flex;
+      gap: 5px;
+      flex-wrap: wrap;
+      margin-top: 4px;
+    }
+
+    .tag {
+      font-family: 'JetBrains Mono', monospace;
+      font-size: 10px;
+      padding: 2px 9px;
+      border-radius: 20px;
+      font-weight: 500;
+      background: #f1f5f9;
+      color: var(--teal);
+      border: 1px solid #cbd5e1;
+    }
+
+    .tag.green  { background: #f0fdf4; color: #16a34a; border-color: #bbf7d0; }
+    .tag.orange { background: #fff7ed; color: #c2410c; border-color: #fed7aa; }
+    .tag.purple { background: #faf5ff; color: #7c3aed; border-color: #ddd6fe; }
+    .tag.gray   { background: #f1f5f9; color: #475569; border-color: #cbd5e1; }
+
+    .card-badge {
+      position: absolute;
+      top: 14px; right: 14px;
+      font-family: 'JetBrains Mono', monospace;
+      font-size: 9px;
+      letter-spacing: .1em;
+      text-transform: uppercase;
+      padding: 2px 8px;
+      border-radius: 20px;
+      font-weight: 700;
+    }
+
+    .badge-current { background: var(--teal); color: #fff; }
+    .badge-soon    { background: #f1f5f9; color: var(--muted); border: 1px solid var(--border); }
+    .badge-extra   { background: #faf5ff; color: #7c3aed; border: 1px solid #ddd6fe; }
+
+    /* ── Footer ── */
+    footer {
+      border-top: 1px solid var(--border);
+      padding: 24px 64px;
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      font-size: 13px;
+      color: var(--muted);
+      background: var(--white);
+    }
+
+    footer a { color: var(--teal); text-decoration: none; }
+    footer a:hover { text-decoration: underline; }
+
+    @media (max-width: 640px) {
+      header { padding: 28px 24px 24px; }
+      main { padding: 32px 24px 60px; }
+      footer { padding: 20px 24px; flex-direction: column; gap: 8px; text-align: center; }
+      .lecture-grid { grid-template-columns: 1fr; }
+    }
+  </style>
+</head>
+<body>
+
+<header>
+  <div class="header-logos">
+    <img src="https://www.vildika.com/wp-content/uploads/visma-logo-png-transparent-small.png" alt="Visma">
+    <img src="https://upload.wikimedia.org/wikipedia/commons/1/12/VILNIUS-TECH-LT.png" alt="Vilnius Tech">
+  </div>
+  <div class="stag">Course Materials</div>
+  <h1>Data Structures &amp;<br><span class="accent">Algorithms</span></h1>
+  <div class="accent-line"></div>
+  <p class="header-meta">
+    <strong>Austėja Rušėnaitė</strong>
+    &nbsp;·&nbsp; 2026
+    &nbsp;·&nbsp; Vilnius Tech &amp; Visma
+  </p>
+</header>
+
+<main>
+
+  <!-- ══════════════════════════════════════
+       PART I — DATA STRUCTURES
+  ══════════════════════════════════════ -->
+  <div class="part-label">Part I — Data Structures</div>
+  <div class="lecture-grid">
+
+    <a class="lecture-card unavailable" href="01_Introduction_to_Python.html">
+      <span class="card-badge badge-soon">Coming Soon</span>
+      <div class="card-num">Lecture 01</div>
+      <div class="card-title">Introduction to Python</div>
+      <div class="card-subtitle">Syntax, data types, lists, dicts, sets, tuples, control structures, functions.</div>
+      <div class="card-tags">
+        <span class="tag">Python</span>
+        <span class="tag gray">Basics</span>
+      </div>
+    </a>
+
+    <a class="lecture-card unavailable" href="02_Abstract_Data_Types.html">
+      <span class="card-badge badge-soon">Coming Soon</span>
+      <div class="card-num">Lecture 02</div>
+      <div class="card-title">Abstract Data Types</div>
+      <div class="card-subtitle">ADTs, arrays, matrix, set, map, hashing &amp; collision resolution strategies.</div>
+      <div class="card-tags">
+        <span class="tag">ADT</span>
+        <span class="tag">Arrays</span>
+        <span class="tag">Hashing</span>
+      </div>
+    </a>
+
+    <a class="lecture-card unavailable" href="03_Linked_Lists.html">
+      <span class="card-badge badge-soon">Coming Soon</span>
+      <div class="card-num">Lecture 03</div>
+      <div class="card-title">Linear DS: Linked Lists</div>
+      <div class="card-subtitle">Singly, doubly &amp; circular linked lists. Iterative vs recursive traversal.</div>
+      <div class="card-tags">
+        <span class="tag">Linked Lists</span>
+        <span class="tag green">Linear</span>
+      </div>
+    </a>
+
+    <a class="lecture-card unavailable" href="04_Stack_Queue_Priority_Deque.html">
+      <span class="card-badge badge-soon">Coming Soon</span>
+      <div class="card-num">Lecture 04</div>
+      <div class="card-title">Stack, Queue, Priority Queue &amp; Deque</div>
+      <div class="card-subtitle">LIFO &amp; FIFO structures, deque, priority queue, comparative analysis &amp; applications.</div>
+      <div class="card-tags">
+        <span class="tag">Stack</span>
+        <span class="tag">Queue</span>
+        <span class="tag green">Linear</span>
+      </div>
+    </a>
+
+  </div>
+
+  <!-- ══════════════════════════════════════
+       PART II — ALGORITHMS
+  ══════════════════════════════════════ -->
+  <div class="part-label">Part II — Algorithms</div>
+  <div class="lecture-grid">
+
+    <a class="lecture-card unavailable" href="05_Algorithms_and_Complexity.html">
+      <span class="card-badge badge-soon">Coming Soon</span>
+      <div class="card-num">Lecture 05</div>
+      <div class="card-title">Algorithms &amp; Complexity</div>
+      <div class="card-subtitle">Algorithm design, classification, flowcharts, Big O / Ω / Θ notation, time &amp; space complexity.</div>
+      <div class="card-tags">
+        <span class="tag">Complexity</span>
+        <span class="tag orange">Big O</span>
+      </div>
+    </a>
+
+    <a class="lecture-card unavailable" href="06_Recursion.html">
+      <span class="card-badge badge-soon">Coming Soon</span>
+      <div class="card-num">Lecture 06</div>
+      <div class="card-title">Recursion</div>
+      <div class="card-subtitle">Base &amp; recursive cases, call stack, backtracking, memoization vs tabulation.</div>
+      <div class="card-tags">
+        <span class="tag">Recursion</span>
+        <span class="tag">Backtracking</span>
+        <span class="tag">Memoization</span>
+      </div>
+    </a>
+
+    <a class="lecture-card unavailable" href="07_Sorting_Algorithms_Part_I.html">
+      <span class="card-badge badge-soon">Coming Soon</span>
+      <div class="card-num">Lecture 07</div>
+      <div class="card-title">Sorting Algorithms — Part I</div>
+      <div class="card-subtitle">Bubble, Selection &amp; Insertion Sort. Stability, in-place &amp; comparison-based analysis.</div>
+      <div class="card-tags">
+        <span class="tag">Sorting</span>
+        <span class="tag orange">O(n²)</span>
+      </div>
+    </a>
+
+    <a class="lecture-card current" href="08_Sorting_Algorithms_Part_II.html">
+      <span class="card-badge badge-current">Available</span>
+      <div class="card-num">Lecture 08</div>
+      <div class="card-title">Sorting Algorithms — Part II</div>
+      <div class="card-subtitle">Divide &amp; Conquer · Merge Sort · Quick Sort · Shell Sort · Radix · Heap · Counting Sort</div>
+      <div class="card-tags">
+        <span class="tag">Sorting</span>
+        <span class="tag green">O(n log n)</span>
+        <span class="tag">Animated</span>
+      </div>
+    </a>
+
+    <a class="lecture-card unavailable" href="09_Searching_Algorithms.html">
+      <span class="card-badge badge-soon">Coming Soon</span>
+      <div class="card-num">Lecture 09</div>
+      <div class="card-title">Searching Algorithms</div>
+      <div class="card-subtitle">Linear, Binary, Jump &amp; Interpolation search. Hashing for search. Complexity comparison.</div>
+      <div class="card-tags">
+        <span class="tag">Searching</span>
+        <span class="tag green">Binary Search</span>
+      </div>
+    </a>
+
+  </div>
+
+  <!-- ══════════════════════════════════════
+       PART III — DS & ALGORITHMS COMBINED
+  ══════════════════════════════════════ -->
+  <div class="part-label">Part III — Data Structures &amp; Algorithms Combined</div>
+  <div class="lecture-grid">
+
+    <a class="lecture-card unavailable" href="10_Trees.html">
+      <span class="card-badge badge-soon">Coming Soon</span>
+      <div class="card-num">Lecture 10</div>
+      <div class="card-title">Non-linear DS: Trees</div>
+      <div class="card-subtitle">Binary trees, BST, heaps, BFS &amp; DFS, inorder / preorder / postorder traversal.</div>
+      <div class="card-tags">
+        <span class="tag">Trees</span>
+        <span class="tag">BST</span>
+        <span class="tag green">BFS / DFS</span>
+      </div>
+    </a>
+
+    <a class="lecture-card unavailable" href="11_Self_Balancing_Trees.html">
+      <span class="card-badge badge-soon">Coming Soon</span>
+      <div class="card-num">Lecture 11</div>
+      <div class="card-title">Self-Balancing Trees</div>
+      <div class="card-subtitle">AVL trees, Red-Black trees, B-trees. Balance factor, ordered sets &amp; maps.</div>
+      <div class="card-tags">
+        <span class="tag">AVL</span>
+        <span class="tag">Red-Black</span>
+        <span class="tag">B-Tree</span>
+      </div>
+    </a>
+
+    <a class="lecture-card unavailable" href="12_Graphs.html">
+      <span class="card-badge badge-soon">Coming Soon</span>
+      <div class="card-num">Lecture 12</div>
+      <div class="card-title">Non-linear DS: Graphs</div>
+      <div class="card-subtitle">Graph types &amp; representations, directed/undirected, weighted, DFS &amp; BFS traversal.</div>
+      <div class="card-tags">
+        <span class="tag">Graphs</span>
+        <span class="tag green">BFS / DFS</span>
+      </div>
+    </a>
+
+    <a class="lecture-card unavailable" href="13_Graph_Algorithms.html">
+      <span class="card-badge badge-extra">Extra</span>
+      <div class="card-num">Lecture 13</div>
+      <div class="card-title">Graph Algorithms</div>
+      <div class="card-subtitle">Dijkstra's, Bellman-Ford shortest paths. Prim's &amp; Kruskal's MST algorithms.</div>
+      <div class="card-tags">
+        <span class="tag purple">Extra</span>
+        <span class="tag">Shortest Path</span>
+        <span class="tag">MST</span>
+      </div>
+    </a>
+
+    <a class="lecture-card unavailable" href="14_Algorithm_Design_Techniques.html">
+      <span class="card-badge badge-extra">Extra</span>
+      <div class="card-num">Lecture 14</div>
+      <div class="card-title">Algorithm Design Techniques</div>
+      <div class="card-subtitle">Dynamic programming basics. Greedy algorithms.</div>
+      <div class="card-tags">
+        <span class="tag purple">Extra</span>
+        <span class="tag">Dynamic Programming</span>
+        <span class="tag">Greedy</span>
+      </div>
+    </a>
+
+  </div>
+
+</main>
+
+<footer>
+  <span>Data Structures &amp; Algorithms · Austėja Rušėnaitė · 2026</span>
+  <a href="https://github.com/tech-go-open/data-structures-and-algorithms-course" target="_blank">↗ GitHub Repository</a>
+</footer>
+
+</body>
+</html>
